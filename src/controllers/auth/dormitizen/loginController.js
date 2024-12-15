@@ -31,12 +31,12 @@ const handleLogin = async (req, res) => {
         }
 
         const accessToken = jwt.sign(
-            { dormitizen_id: dormitizenFound.dormitizen_id },
+            { user_id: dormitizenFound.dormitizen_id, type: 'dormitizen' },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '60m' }
         );
         const refreshToken = jwt.sign(
-            { dormitizen_id: dormitizenFound.dormitizen_id },
+            { user_id: dormitizenFound.dormitizen_id, type: 'dormitizen' },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '1d' }
         );

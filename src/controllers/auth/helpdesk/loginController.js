@@ -31,12 +31,12 @@ const handleLogin = async (req, res) => {
         }
 
         const accessToken = jwt.sign(
-            { helpdesk_id: helpdeskFound.helpdesk_id },
+            { user_id: helpdeskFound.helpdesk_id, type: 'helpdesk' },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '60m' }
         );
         const refreshToken = jwt.sign(
-            { helpdesk_id: helpdeskFound.helpdesk_id },
+            { user_id: helpdeskFound.helpdesk_id, type: 'helpdesk' },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '1d' }
         );
