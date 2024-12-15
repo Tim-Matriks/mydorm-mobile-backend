@@ -1,4 +1,4 @@
-const Dormitizen = require('../../models/dormitizen.js');
+const Helpdesk = require('../../../models/helpdesk.js');
 
 const handleLogout = async (req, res) => {
     const cookies = req.cookies;
@@ -10,10 +10,10 @@ const handleLogout = async (req, res) => {
 
     const refreshToken = cookies.jwt;
 
-    const dormitizenFound = await Dormitizen.findOne({
+    const helpdeskFound = await Helpdesk.findOne({
         where: { refresh_token: refreshToken },
     });
-    if (!dormitizenFound) {
+    if (!helpdeskFound) {
         res.clearCookie('jwt', refreshToken, {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000,
@@ -23,8 +23,8 @@ const handleLogout = async (req, res) => {
             .json({ message: 'User not found, token cleared' });
     }
 
-    await dormitizenFound.update(
-        { refreshToken: null },
+    await helpdeskFound.update(
+        { refresh_token: null },
         { where: { refresh_token: refreshToken } }
     );
     res.clearCookie('jwt', refreshToken, {

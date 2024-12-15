@@ -1,4 +1,4 @@
-const Dormitizen = require('../../models/dormitizen.js');
+const Helpdesk = require('../../../models/helpdesk.js');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -12,17 +12,17 @@ const handleLogin = async (req, res) => {
     }
 
     try {
-        const dormitizenFound = await Dormitizen.findOne({
+        const helpdeskFound = await Helpdesk.findOne({
             where: { username },
         });
-        if (!dormitizenFound) {
+        if (!helpdeskFound) {
             return res
                 .status(401)
                 .json({ message: 'Username atau password salah' });
         }
         const verifikasi = await bcrypt.compare(
             password,
-            dormitizenFound.password
+            helpdeskFound.password
         );
         if (!verifikasi) {
             return res
@@ -31,19 +31,19 @@ const handleLogin = async (req, res) => {
         }
 
         const accessToken = jwt.sign(
-            { dormitizen_id: dormitizenFound.dormitizen_id },
+            { helpdesk_id: helpdeskFound.helpdesk_id },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '60m' }
         );
         const refreshToken = jwt.sign(
-            { dormitizen_id: dormitizenFound.dormitizen_id },
+            { helpdesk_id: helpdeskFound.helpdesk_id },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '1d' }
         );
 
-        await Dormitizen.update(
+        await Helpdesk.update(
             { refresh_token: refreshToken },
-            { where: { dormitizen_id: dormitizenFound.dormitizen_id } }
+            { where: { helpdesk_id: helpdeskFound.helpdesk_id } }
         );
 
         res.cookie('jwt', refreshToken, {

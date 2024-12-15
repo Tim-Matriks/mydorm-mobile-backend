@@ -1,4 +1,4 @@
-const Dormitizen = require('../../models/dormitizen.js');
+const Dormitizen = require('../../../models/dormitizen.js');
 const { Op } = require('sequelize');
 const bcrypt = require('bcrypt');
 
