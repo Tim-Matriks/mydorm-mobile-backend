@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const db = require('./src/configs/database.js');
 const cookieParser = require('cookie-parser');
+const verifyJWT = require('./src/middleware/verifyJWT.js');
 const app = express();
 
 app.use(cors());
@@ -15,6 +16,7 @@ app.use(cookieParser());
 })();
 app.use('/dormitizen', require('./src/routes/dormitizenRoutes.js'));
 app.use('/helpdesk', require('./src/routes/helpdeskRoutes.js'));
+app.use('/laporan', verifyJWT, require('./src/routes/laporanRoutes.js'));
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
