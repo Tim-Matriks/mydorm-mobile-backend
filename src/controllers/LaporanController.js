@@ -1,18 +1,21 @@
-const { Op } = require('sequelize');
 const Laporan = require('../models/laporan.js');
 
 const getAllLaporanByUser = async (req, res) => {
+    const user_id = req.user_id;
+    const user_type = req.user_type;
+    const whereClause =
+        user_type == 'dormitizen'
+            ? { dormitizen_id: user_id }
+            : { helpdesk_id: user_id };
+    const include = user_type == 'dormitizen' ? 'dormitizen' : 'helpdesk';
+
     try {
         const response = await Laporan.findAll({
-            where: {
-                [Op.or]: [
-                    { dormitizen_id: req.user_id },
-                    { helpdesk_id: req.user_id },
-                ],
-            },
+            where: whereClause,
+            include: include,
         });
         res.json({
-            message: 'Data laporan berhasil diambil',
+            message: `Data laporan ${user_type} berhasil diambil`,
             data: response,
         });
     } catch (error) {
@@ -36,62 +39,62 @@ const createLaporan = async (req, res) => {
     }
 };
 
-const updateProduct = async (req, res) => {
-    try {
-        const {
-            price,
-            quantity: oldStock,
-            sold: oldSold,
-        } = await Product.findOne({
-            where: { product_id: req.params.product_id },
-            attributes: ['price', 'quantity', 'sold'],
-        });
+// const updateProduct = async (req, res) => {
+//     try {
+//         const {
+//             price,
+//             quantity: oldStock,
+//             sold: oldSold,
+//         } = await Product.findOne({
+//             where: { product_id: req.params.product_id },
+//             attributes: ['price', 'quantity', 'sold'],
+//         });
 
-        // Membuat report
-        const { stock, sold } = req.body;
-        if (stock == oldStock && sold == oldSold) {
-            return res.json({ message: 'Tidak ada perubahan stock atau sold' });
-        } else {
-            const report = Report.build();
-            if (stock > oldStock) {
-                report.stock_in = stock - oldStock;
-            } else {
-                report.stock_in = 0;
-            }
-            if (sold > oldSold) {
-                report.stock_out = sold - oldSold;
-                report.revenue = price * report.stock_out;
-            } else {
-                report.stock_out = 0;
-                report.revenue = 0;
-            }
+//         // Membuat report
+//         const { stock, sold } = req.body;
+//         if (stock == oldStock && sold == oldSold) {
+//             return res.json({ message: 'Tidak ada perubahan stock atau sold' });
+//         } else {
+//             const report = Report.build();
+//             if (stock > oldStock) {
+//                 report.stock_in = stock - oldStock;
+//             } else {
+//                 report.stock_in = 0;
+//             }
+//             if (sold > oldSold) {
+//                 report.stock_out = sold - oldSold;
+//                 report.revenue = price * report.stock_out;
+//             } else {
+//                 report.stock_out = 0;
+//                 report.revenue = 0;
+//             }
 
-            const obj = new Date();
-            report.day = obj.getDate();
-            report.month = obj.getMonth() + 1;
-            report.year = obj.getFullYear();
+//             const obj = new Date();
+//             report.day = obj.getDate();
+//             report.month = obj.getMonth() + 1;
+//             report.year = obj.getFullYear();
 
-            report.product_id = req.params.product_id;
-            await report.save();
-        }
+//             report.product_id = req.params.product_id;
+//             await report.save();
+//         }
 
-        // Ubah stock dan sold di product
-        await Product.update(
-            {
-                quantity: stock,
-                sold,
-            },
-            {
-                where: {
-                    product_id: req.params.product_id,
-                },
-            }
-        );
-        res.json({ message: 'Data produk berhasil diubah. Laporan ditambah' });
-    } catch (error) {
-        res.status(500).json({ message: error.message, data: null });
-    }
-};
+//         // Ubah stock dan sold di product
+//         await Product.update(
+//             {
+//                 quantity: stock,
+//                 sold,
+//             },
+//             {
+//                 where: {
+//                     product_id: req.params.product_id,
+//                 },
+//             }
+//         );
+//         res.json({ message: 'Data produk berhasil diubah. Laporan ditambah' });
+//     } catch (error) {
+//         res.status(500).json({ message: error.message, data: null });
+//     }
+// };
 
 module.exports = {
     getAllLaporanByUser,

@@ -1,4 +1,6 @@
 const { Sequelize } = require('sequelize');
+const Dormitizen = require('../models/dormitizen.js');
+const Helpdesk = require('../models/helpdesk.js');
 const db = require('../configs/database.js');
 
 const { DataTypes } = Sequelize;
@@ -35,11 +37,13 @@ const Laporan = db.define(
     }
 );
 
-Laporan.associations = (models) => {
-    Laporan.belongsTo(models.dormitizen, {
-        foreignKey: 'dormitizen_id',
-        as: 'dormitizen',
-    });
-};
+Laporan.belongsTo(Dormitizen, {
+    foreignKey: 'dormitizen_id',
+    as: 'dormitizen',
+});
+Laporan.belongsTo(Helpdesk, {
+    foreignKey: 'helpdesk_id',
+    as: 'helpdesk',
+});
 
 module.exports = Laporan;
