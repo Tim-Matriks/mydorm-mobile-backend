@@ -2,21 +2,15 @@ const Laporan = require('../models/laporan.js');
 
 const getAllLaporanByUser = async (req, res) => {
     const user_id = req.user_id;
-    const user_type = req.user_type;
-    const whereClause =
-        user_type == 'dormitizen'
-            ? { dormitizen_id: user_id }
-            : { helpdesk_id: user_id };
-    const include = user_type == 'dormitizen' ? 'dormitizen' : 'helpdesk';
 
     try {
         const response = await Laporan.findAll({
-            where: whereClause,
-            include: include,
+            where: { dormitizen_id: user_id },
         });
         res.json({
-            message: `Data laporan ${user_type} berhasil diambil`,
+            message: `Data laporan berhasil diambil`,
             data: response,
+            user_type: req.user_type,
         });
     } catch (error) {
         res.status(500).json({ message: error.message, data: null });
@@ -26,11 +20,8 @@ const getAllLaporanByUser = async (req, res) => {
 const createLaporan = async (req, res) => {
     try {
         const laporan = await Laporan.build(req.body);
-        if (req.user_type == 'dormitizen') {
-            laporan.dormitizen_id = req.user_id;
-        } else if (req.user_type == 'helpdesk') {
-            laporan.helpdesk_id = req.user_id;
-        }
+        laporan.dormitizen_id = req.user_id;
+
         await laporan.save();
 
         res.status(201).json({ message: 'Laporan berhasil dibuat' });
