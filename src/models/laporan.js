@@ -18,14 +18,14 @@ const Laporan = db.define(
         dormitizen_id: {
             type: DataTypes.BIGINT,
             references: {
-                model: 'dormitizen', // Nama tabel penjaga
+                model: 'dormitizen',
                 key: 'dormitizen_id',
             },
         },
         helpdesk_id: {
             type: DataTypes.BIGINT,
             references: {
-                model: 'helpdesk', // Nama tabel penjaga
+                model: 'helpdesk',
                 key: 'helpdesk_id',
             },
         },
