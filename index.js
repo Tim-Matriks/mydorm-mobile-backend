@@ -15,7 +15,6 @@ app.use(cookieParser());
     await db.sync();
 })();
 app.use('/dormitizen', require('./src/routes/dormitizenRoutes.js'));
-app.use('/helpdesk', require('./src/routes/helpdeskRoutes.js'));
 app.use('/laporan', verifyJWT, require('./src/routes/laporanRoutes.js'));
 
 app.listen(PORT, () => {
