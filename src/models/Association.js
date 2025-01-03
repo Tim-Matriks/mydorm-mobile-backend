@@ -71,10 +71,12 @@ Paket.belongsTo(Helpdesk, {
     foreignKey: 'penyerahan_paket',
 });
 
-// Relasi tiap pelanggaran punya pelanggar dan pelapor(?)
+// Relasi tiap pelanggaran punya pelanggar dan pelapor
+Dormitizen.hasMany(Pelanggaran, { foreignKey: 'dormitizen_id' });
 Pelanggaran.belongsTo(Dormitizen, {
     foreignKey: 'dormitizen_id',
 });
+SeniorResident.hasMany(Pelanggaran, { foreignKey: 'senior_resident_id' });
 Pelanggaran.belongsTo(SeniorResident, {
     foreignKey: 'senior_resident_id',
 });
