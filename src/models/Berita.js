@@ -9,7 +9,6 @@ const Berita = db.define('berita', {
         primaryKey: true,
         autoIncrement: true,
     },
-    status_pengambilan: DataTypes.ENUM('sudah', 'belum'),
     judul: DataTypes.STRING(100),
     isi: DataTypes.TEXT,
     kategori: DataTypes.STRING(50),
