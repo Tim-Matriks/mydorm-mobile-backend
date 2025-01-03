@@ -1,5 +1,5 @@
-const Dormitizen = require('../../../models/dormitizen.js');
-const SeniorResident = require('../../../models/senior_resident.js');
+const Dormitizen = require('../../../models/Dormitizen.js');
+const SeniorResident = require('../../../models/SeniorResident.js');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();

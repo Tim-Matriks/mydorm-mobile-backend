@@ -1,4 +1,4 @@
-const Laporan = require('../models/laporan.js');
+const Laporan = require('../models/Laporan.js');
 
 const getAllLaporanByUser = async (req, res) => {
     const user_id = req.user_id;
@@ -10,7 +10,6 @@ const getAllLaporanByUser = async (req, res) => {
         res.json({
             message: `Data laporan berhasil diambil`,
             data: response,
-            user_type: req.user_type,
         });
     } catch (error) {
         res.status(500).json({ message: error.message, data: null });
