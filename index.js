@@ -11,12 +11,26 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
+// Untuk mengatur relasi antar tabel
+require('./src/models/Association.js');
+
 (async () => {
     await db.sync();
 })();
-app.use('/dormitizen', require('./src/routes/dormitizenRoutes.js'));
-app.use('/helpdesk', require('./src/routes/helpdeskRoutes.js'));
-app.use('/laporan', verifyJWT, require('./src/routes/laporanRoutes.js'));
+app.use('/', require('./src/routes/AuthRoutes.js'));
+app.use('/user', verifyJWT, require('./src/routes/DormitizenRoutes.js'));
+app.use('/laporan', verifyJWT, require('./src/routes/LaporanRoutes.js'));
+app.use('/berita', verifyJWT, require('./src/routes/BeritaRoutes.js'));
+app.use(
+    '/pelanggaran',
+    verifyJWT,
+    require('./src/routes/PelanggaranRoutes.js')
+);
+app.use(
+    '/logKeluarMasuk',
+    verifyJWT,
+    require('./src/routes/LogKeluarMasukRoutes.js')
+);
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);

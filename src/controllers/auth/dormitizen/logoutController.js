@@ -1,4 +1,4 @@
-const Dormitizen = require('../../../models/dormitizen.js');
+const Dormitizen = require('../../../models/Dormitizen.js');
 
 const handleLogout = async (req, res) => {
     const cookies = req.cookies;

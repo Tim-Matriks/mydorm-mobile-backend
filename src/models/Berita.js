@@ -3,21 +3,15 @@ const db = require('../configs/database.js');
 
 const { DataTypes } = Sequelize;
 
-const Laporan = db.define('laporan', {
-    laporan_id: {
+const Berita = db.define('berita', {
+    berita_id: {
         type: DataTypes.BIGINT,
         primaryKey: true,
         autoIncrement: true,
     },
-    judul: DataTypes.STRING,
+    judul: DataTypes.STRING(100),
     isi: DataTypes.TEXT,
-    dormitizen_id: {
-        type: DataTypes.BIGINT,
-        references: {
-            model: 'dormitizen',
-            key: 'dormitizen_id',
-        },
-    },
+    kategori: DataTypes.STRING(50),
     helpdesk_id: {
         type: DataTypes.BIGINT,
         references: {
@@ -27,4 +21,4 @@ const Laporan = db.define('laporan', {
     },
 });
 
-module.exports = Laporan;
+module.exports = Berita;

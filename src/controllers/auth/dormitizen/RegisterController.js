@@ -1,9 +1,21 @@
-const Dormitizen = require('../../../models/dormitizen.js');
+const Dormitizen = require('../../../models/Dormitizen.js');
 const { Op } = require('sequelize');
 const bcrypt = require('bcrypt');
 
 const handleRegister = async (req, res) => {
-    const { username, password, nim, nama } = req.body;
+    const {
+        nim,
+        nama,
+        username,
+        password,
+        prodi,
+        agama,
+        no_hp,
+        no_hp_ortu,
+        alamat_ortu,
+        gambar,
+        kamar_id,
+    } = req.body;
     if (!username || !password || !nim || !nama) {
         return res.status(400).json({ message: 'Data tidak lengkap' });
     }
@@ -21,6 +33,13 @@ const handleRegister = async (req, res) => {
             password: hashedPwd,
             nim,
             nama,
+            prodi,
+            agama,
+            no_hp,
+            no_hp_ortu,
+            alamat_ortu,
+            gambar,
+            kamar_id,
         };
         await Dormitizen.create(newDormitizen);
         res.status(201).json({ message: 'User Dormitizen berhasil dibuat' });

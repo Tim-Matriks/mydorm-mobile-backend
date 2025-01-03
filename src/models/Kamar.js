@@ -3,17 +3,14 @@ const db = require('../configs/database.js');
 
 const { DataTypes } = Sequelize;
 
-const Helpdesk = db.define('helpdesk', {
-    helpdesk_id: {
+const Kamar = db.define('kamar', {
+    kamar_id: {
         type: DataTypes.BIGINT,
         primaryKey: true,
         autoIncrement: true,
     },
-    nip: DataTypes.STRING(18),
-    nama: DataTypes.STRING(100),
-    username: DataTypes.STRING(100),
-    password: DataTypes.STRING(100),
-    refresh_token: DataTypes.STRING,
+    nomor: DataTypes.STRING(3),
+    status: DataTypes.ENUM('terbuka', 'terkunci'),
     gedung_id: {
         type: DataTypes.BIGINT,
         references: {
@@ -23,4 +20,4 @@ const Helpdesk = db.define('helpdesk', {
     },
 });
 
-module.exports = Helpdesk;
+module.exports = Kamar;
