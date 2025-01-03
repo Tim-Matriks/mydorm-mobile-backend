@@ -7,6 +7,12 @@ const db = new Sequelize(
     {
         host: process.env.DB_HOST,
         dialect: 'mysql',
+        timezone: '+07:00',
+        define: {
+            freezeTableName: true,
+            createdAt: 'created_at',
+            updatedAt: 'updated_at',
+        },
     }
 );
 

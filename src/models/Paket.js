@@ -3,14 +3,16 @@ const db = require('../configs/database.js');
 
 const { DataTypes } = Sequelize;
 
-const Laporan = db.define('laporan', {
-    laporan_id: {
+const Paket = db.define('paket', {
+    paket_id: {
         type: DataTypes.BIGINT,
         primaryKey: true,
         autoIncrement: true,
     },
-    judul: DataTypes.STRING,
-    isi: DataTypes.TEXT,
+    status_pengambilan: DataTypes.ENUM('sudah', 'belum'),
+    waktu_tiba: DataTypes.DATE,
+    waktu_diambil: DataTypes.DATE,
+    waktu_diambil: DataTypes.DATE,
     dormitizen_id: {
         type: DataTypes.BIGINT,
         references: {
@@ -18,13 +20,21 @@ const Laporan = db.define('laporan', {
             key: 'dormitizen_id',
         },
     },
-    helpdesk_id: {
+    penerima_paket: {
         type: DataTypes.BIGINT,
         references: {
             model: 'helpdesk',
             key: 'helpdesk_id',
         },
     },
+    penyerahan_paket: {
+        type: DataTypes.BIGINT,
+        references: {
+            model: 'helpdesk',
+            key: 'helpdesk_id',
+        },
+    },
+    gambar: DataTypes.STRING,
 });
 
-module.exports = Laporan;
+module.exports = Paket;
