@@ -9,6 +9,14 @@ const Paket = require('./Paket');
 const Pelanggaran = require('./Pelanggaran');
 const SeniorResident = require('./SeniorResident');
 
+// Relasi tiap gedung punya beberapa helpdesk
+Helpdesk.belongsTo(Gedung, {
+    foreignKey: 'helpdesk_id',
+});
+Gedung.hasMany(Helpdesk, {
+    foreignKey: 'helpdesk_id',
+});
+
 // Relasi dormitizen dapat menjadi SR
 Dormitizen.hasOne(SeniorResident, {
     foreignKey: 'dormitizen_id',
@@ -49,14 +57,6 @@ LogKeluarMasuk.belongsTo(SeniorResident, {
     foreignKey: 'senior_resident_id',
 });
 LogKeluarMasuk.belongsTo(Helpdesk, {
-    foreignKey: 'helpdesk_id',
-});
-
-// Relasi tiap gedung punya beberapa helpdesk
-Helpdesk.belongsTo(Gedung, {
-    foreignKey: 'helpdesk_id',
-});
-Gedung.hasMany(Helpdesk, {
     foreignKey: 'helpdesk_id',
 });
 
