@@ -63,6 +63,7 @@ const handleLogin = async (req, res) => {
         });
         res.json({
             message: 'Login berhasil',
+            user_type,
             accessToken,
         });
     } catch (error) {
