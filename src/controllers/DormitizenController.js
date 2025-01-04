@@ -1,4 +1,5 @@
 const Dormitizen = require('../models/Dormitizen.js');
+const Gedung = require('../models/Gedung.js');
 const Kamar = require('../models/Kamar.js');
 const SeniorResident = require('../models/SeniorResident.js');
 
@@ -8,9 +9,26 @@ const getLoggedInUser = async (req, res) => {
 
     try {
         const response = await Dormitizen.findAll({
-            attributes: { exclude: ['password', 'refresh_token'] },
+            attributes: {
+                exclude: [
+                    'password',
+                    'refresh_token',
+                    'kamar_id',
+                    'created_at',
+                    'updated_at',
+                ],
+            },
             where: { dormitizen_id: user_id },
-            include: Kamar,
+            include: {
+                model: Kamar,
+                attributes: {
+                    exclude: ['created_at', 'updated_at', 'gedung_id'],
+                },
+                include: {
+                    model: Gedung,
+                    attributes: { exclude: ['created_at', 'updated_at'] },
+                },
+            },
         });
         res.json({
             message: `Data user login berhasil diambil`,
