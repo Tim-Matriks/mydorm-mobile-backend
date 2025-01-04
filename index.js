@@ -14,9 +14,9 @@ app.use(cookieParser());
 // Untuk mengatur relasi antar tabel
 require('./src/models/Association.js');
 
-(async () => {
-    await db.sync();
-})();
+// (async () => {
+//     await db.sync();
+// })();
 app.use('/', require('./src/routes/AuthRoutes.js'));
 app.use('/user', verifyJWT, require('./src/routes/DormitizenRoutes.js'));
 app.use('/laporan', verifyJWT, require('./src/routes/LaporanRoutes.js'));
