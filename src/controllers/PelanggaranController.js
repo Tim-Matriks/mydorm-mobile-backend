@@ -1,3 +1,5 @@
+const Dormitizen = require('../models/Dormitizen.js');
+const Kamar = require('../models/Kamar.js');
 const Pelanggaran = require('../models/Pelanggaran.js');
 const SeniorResident = require('../models/SeniorResident.js');
 
@@ -11,7 +13,26 @@ const getAllPelanggaran = async (req, res) => {
                 data: null,
             });
         }
-        const response = await Pelanggaran.findAll();
+        const response = await Pelanggaran.findAll({
+            include: {
+                model: Dormitizen,
+                attributes: {
+                    exclude: [
+                        'password',
+                        'refresh_token',
+                        'kamar_id',
+                        'created_at',
+                        'updated_at',
+                    ],
+                },
+                include: {
+                    model: Kamar,
+                    attributes: {
+                        exclude: ['created_at', 'updated_at', 'gedung_id'],
+                    },
+                },
+            },
+        });
         res.json({
             message: `Data pelanggaran berhasil diambil`,
             data: response,
