@@ -73,7 +73,31 @@ const createPelanggaran = async (req, res) => {
     }
 };
 
+const deletePelanggaran = async (req, res) => {
+    const user_type = req.user_type;
+    const pelanggaran_id = req.params.pelanggaran_id;
+
+    try {
+        if (user_type != 'senior_resident') {
+            return res.status(403).json({
+                message: 'Harus login sebagai senior resident',
+                data: null,
+            });
+        }
+
+        await Pelanggaran.destroy({ where: { pelanggaran_id } });
+
+        res.status(200).json({
+            message: 'Pelanggaran berhasil dihapus',
+            data: null,
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message, data: null });
+    }
+};
+
 module.exports = {
     getAllPelanggaran,
     createPelanggaran,
+    deletePelanggaran,
 };
