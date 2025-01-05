@@ -18,6 +18,7 @@ require('./src/models/Association.js');
 //     await db.sync();
 // })();
 app.use('/', require('./src/routes/AuthRoutes.js'));
+app.use('/helpdesk', require('./src/routes/HelpdeskAuthRoutes.js'));
 app.use('/user', verifyJWT, require('./src/routes/DormitizenRoutes.js'));
 app.use('/laporan', verifyJWT, require('./src/routes/LaporanRoutes.js'));
 app.use('/berita', verifyJWT, require('./src/routes/BeritaRoutes.js'));
