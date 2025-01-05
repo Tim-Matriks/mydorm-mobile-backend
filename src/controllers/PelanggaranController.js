@@ -2,6 +2,7 @@ const Dormitizen = require('../models/Dormitizen.js');
 const Kamar = require('../models/Kamar.js');
 const Pelanggaran = require('../models/Pelanggaran.js');
 const SeniorResident = require('../models/SeniorResident.js');
+const upload = require('../middleware/multer.js').single('gambar');
 
 const getAllPelanggaran = async (req, res) => {
     const user_type = req.user_type;
@@ -47,26 +48,35 @@ const createPelanggaran = async (req, res) => {
     const user_id = req.user_id;
 
     try {
-        if (user_type != 'senior_resident') {
-            return res.status(403).json({
-                message: 'Harus login sebagai senior resident',
-                data: null,
+        upload(req, res, async (err) => {
+            if (user_type != 'senior_resident') {
+                return res.status(403).json({
+                    message: 'Harus login sebagai senior resident',
+                    data: null,
+                });
+            }
+            if (err?.code === 'LIMIT_FILE_SIZE') {
+                return res
+                    .status(413)
+                    .json({ message: 'File terlalu besar. Max 5MB' });
+            }
+
+            const { senior_resident_id: sr_id } = await SeniorResident.findOne({
+                where: { dormitizen_id: user_id },
             });
-        }
-        const { senior_resident_id: sr_id } = await SeniorResident.findOne({
-            where: { dormitizen_id: user_id },
-        });
 
-        const pelanggaran = await Pelanggaran.build(req.body);
-        pelanggaran.senior_resident_id = sr_id;
+            const pelanggaran = await Pelanggaran.build(req.body);
+            pelanggaran.senior_resident_id = sr_id;
+            pelanggaran.gambar = req.file?.filename;
 
-        await pelanggaran.save();
+            await pelanggaran.save();
 
-        const response = pelanggaran;
+            const response = pelanggaran;
 
-        res.status(201).json({
-            message: 'Pelanggaran berhasil dibuat',
-            data: response,
+            res.status(201).json({
+                message: 'Pelanggaran berhasil dibuat',
+                data: response,
+            });
         });
     } catch (error) {
         res.status(500).json({ message: error.message, data: null });
