@@ -62,9 +62,16 @@ const setSR = async (req, res) => {
 
 const findDormitizenByKamar = async (req, res) => {
     const user_id = req.user_id;
+    const user_type = req.user_type;
     const no_kamar = req.params.no_kamar;
 
     try {
+        if (user_type != 'senior_resident') {
+            return res.status(403).json({
+                message: 'Harus login sebagai senior resident',
+                data: null,
+            });
+        }
         const data_SR = await SeniorResident.findOne({
             where: { dormitizen_id: user_id },
             include: {
