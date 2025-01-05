@@ -1,3 +1,4 @@
+const upload = require('../middleware/multer.js').single('gambar');
 const Dormitizen = require('../models/Dormitizen.js');
 const Helpdesk = require('../models/Helpdesk.js');
 const Kamar = require('../models/Kamar.js');
@@ -138,7 +139,44 @@ const getUserPaket = async (req, res) => {
     }
 };
 
+const createPaket = async (req, res) => {
+    const user_id = req.user_id;
+    const user_type = req.user_type;
+
+    try {
+        upload(req, res, async (err) => {
+            if (user_type != 'helpdesk') {
+                return res.status(403).json({
+                    message: 'Harus login sebagai helpdesk',
+                    data: null,
+                });
+            }
+            if (err?.code === 'LIMIT_FILE_SIZE') {
+                return res
+                    .status(413)
+                    .json({ message: 'File terlalu besar. Max 5MB' });
+            }
+
+            const paket = await Paket.build(req.body);
+            paket.penerima_paket = user_id;
+            paket.gambar = req.file?.filename;
+
+            await paket.save();
+
+            const response = paket;
+
+            res.json({
+                message: `Data paket berhasil ditambahkan`,
+                data: response,
+            });
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message, data: null });
+    }
+};
+
 module.exports = {
     getAllPaket,
     getUserPaket,
+    createPaket,
 };
