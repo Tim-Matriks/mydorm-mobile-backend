@@ -21,6 +21,7 @@ app.use('/', require('./src/routes/AuthRoutes.js'));
 app.use('/user', verifyJWT, require('./src/routes/DormitizenRoutes.js'));
 app.use('/laporan', verifyJWT, require('./src/routes/LaporanRoutes.js'));
 app.use('/berita', verifyJWT, require('./src/routes/BeritaRoutes.js'));
+app.use('/paket', verifyJWT, require('./src/routes/PaketRoutes.js'));
 app.use(
     '/pelanggaran',
     verifyJWT,

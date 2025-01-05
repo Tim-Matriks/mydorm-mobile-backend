@@ -74,9 +74,11 @@ Paket.belongsTo(Dormitizen, {
 });
 Paket.belongsTo(Helpdesk, {
     foreignKey: 'penerima_paket',
+    as: 'penerima paket',
 });
 Paket.belongsTo(Helpdesk, {
     foreignKey: 'penyerahan_paket',
+    as: 'penyerahan paket',
 });
 
 // Relasi tiap pelanggaran punya pelanggar dan pelapor
