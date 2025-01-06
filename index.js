@@ -31,7 +31,7 @@ app.use(
     require('./src/routes/PelanggaranRoutes.js')
 );
 app.use(
-    '/logKeluarMasuk',
+    '/log-keluar-masuk',
     verifyJWT,
     require('./src/routes/LogKeluarMasukRoutes.js')
 );

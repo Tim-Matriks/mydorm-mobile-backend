@@ -22,6 +22,13 @@ const cekStatus = async (req, res) => {
     const user_id = req.user_id;
 
     try {
+        if (user_type == 'helpdesk') {
+            return res.status(403).json({
+                message: 'Anda tidak boleh mengakses ini',
+                data: null,
+            });
+        }
+
         const requestTerbaru = await LogKeluarMasuk.findOne({
             where: { dormitizen_id: user_id },
             order: [['created_at', 'DESC']],
@@ -46,6 +53,13 @@ const requestKeluar = async (req, res) => {
     const user_id = req.user_id;
 
     try {
+        if (user_type == 'helpdesk') {
+            return res.status(403).json({
+                message: 'Anda tidak boleh mengakses ini',
+                data: null,
+            });
+        }
+
         const requestKeluar = await LogKeluarMasuk.create({
             waktu: sequelize.literal('CURRENT_TIMESTAMP'),
             aktivitas: 'keluar',
@@ -66,6 +80,13 @@ const requestMasuk = async (req, res) => {
     const user_id = req.user_id;
 
     try {
+        if (user_type == 'helpdesk') {
+            return res.status(403).json({
+                message: 'Anda tidak boleh mengakses ini',
+                data: null,
+            });
+        }
+
         const requestMasuk = await LogKeluarMasuk.create({
             waktu: sequelize.literal('CURRENT_TIMESTAMP'),
             aktivitas: 'masuk',
@@ -110,7 +131,7 @@ const ubahStatus = async (req, res) => {
         });
 
         res.status(200).json({
-            message: `Update berhasil. Request keluar masuk ${status}`,
+            message: `Update berhasil. Request keluar-masuk ${status}`,
             data: log,
         });
     } catch (error) {
