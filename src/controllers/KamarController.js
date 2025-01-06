@@ -6,6 +6,13 @@ const getUserKamarStatus = async (req, res) => {
     const user_id = req.user_id;
 
     try {
+        if (user_type == 'helpdesk') {
+            return res.status(403).json({
+                message: 'Anda tidak boleh mengakses ini',
+                data: null,
+            });
+        }
+
         const response = await Kamar.findOne({
             attributes: { exclude: ['created_at', 'updated_at'] },
             include: {
