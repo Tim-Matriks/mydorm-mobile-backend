@@ -61,8 +61,29 @@ const requestKeluar = async (req, res) => {
     }
 };
 
+const requestMasuk = async (req, res) => {
+    const user_id = req.user_id;
+
+    try {
+        const requestMasuk = await LogKeluarMasuk.create({
+            waktu: sequelize.literal('CURRENT_TIMESTAMP'),
+            aktivitas: 'masuk',
+            status: 'pending',
+            dormitizen_id: user_id,
+        });
+
+        res.status(201).json({
+            message: 'Request masuk berhasil dibuat',
+            data: requestMasuk,
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message, data: null });
+    }
+};
+
 module.exports = {
     getAllLogKeluarMasukByUser,
     cekStatus,
     requestKeluar,
+    requestMasuk,
 };
