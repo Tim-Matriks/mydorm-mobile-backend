@@ -43,6 +43,47 @@ const getAllPelanggaran = async (req, res) => {
     }
 };
 
+const getPelanggaranById = async (req, res) => {
+    const user_type = req.user_type;
+    const { dormitizen_id } = req.params;
+
+    try {
+        if (user_type != 'senior_resident') {
+            return res.status(403).json({
+                message: 'Harus login sebagai senior resident',
+                data: null,
+            });
+        }
+        const response = await Pelanggaran.findAll({
+            include: {
+                model: Dormitizen,
+                attributes: {
+                    exclude: [
+                        'password',
+                        'refresh_token',
+                        'kamar_id',
+                        'created_at',
+                        'updated_at',
+                    ],
+                },
+                include: {
+                    model: Kamar,
+                    attributes: {
+                        exclude: ['created_at', 'updated_at', 'gedung_id'],
+                    },
+                },
+            },
+            where: { dormitizen_id },
+        });
+        res.json({
+            message: `Data pelanggaran seorang dormitizen berhasil diambil`,
+            data: response,
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message, data: null });
+    }
+};
+
 const createPelanggaran = async (req, res) => {
     const user_type = req.user_type;
     const user_id = req.user_id;
@@ -85,7 +126,7 @@ const createPelanggaran = async (req, res) => {
 
 const deletePelanggaran = async (req, res) => {
     const user_type = req.user_type;
-    const pelanggaran_id = req.params.pelanggaran_id;
+    const { pelanggaran_id } = req.params;
 
     try {
         if (user_type != 'senior_resident') {
@@ -108,6 +149,7 @@ const deletePelanggaran = async (req, res) => {
 
 module.exports = {
     getAllPelanggaran,
+    getPelanggaranById,
     createPelanggaran,
     deletePelanggaran,
 };
