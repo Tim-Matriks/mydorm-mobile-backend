@@ -1,4 +1,5 @@
 const Berita = require('../models/Berita.js');
+const upload = require('../middleware/multer.js').single('gambar');
 
 const getAllBerita = async (req, res) => {
     try {
@@ -14,11 +15,16 @@ const getAllBerita = async (req, res) => {
 
 const createBerita = async (req, res) => {
     try {
-        const response = await Berita.create(req.body);
+        upload(req, res, async (err) => {
+            const berita = await Berita.build(req.body);
+            berita.gambar = req.file?.filename;
 
-        res.status(201).json({
-            message: 'Berita berhasil dibuat',
-            data: response,
+            await berita.save();
+
+            res.status(201).json({
+                message: 'Berita berhasil dibuat',
+                data: berita,
+            });
         });
     } catch (error) {
         res.status(500).json({ message: error.message, data: null });
