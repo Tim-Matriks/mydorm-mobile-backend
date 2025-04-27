@@ -24,7 +24,7 @@ const Berita = db.define('berita', {
     senior_resident_id: {
         type: DataTypes.BIGINT,
         references: {
-            model: SeniorResident,
+            model: 'senior_resident',
             key: 'senior_resident_id',
         },
     },

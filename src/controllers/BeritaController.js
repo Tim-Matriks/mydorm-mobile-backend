@@ -1,4 +1,5 @@
 const Berita = require('../models/Berita.js');
+const SeniorResident = require('../models/SeniorResident.js');
 const upload = require('../middleware/multer.js').single('gambar');
 
 const getAllBerita = async (req, res) => {
@@ -23,7 +24,10 @@ const createBerita = async (req, res) => {
             if (user_type == 'helpdesk') {
                 berita.helpdesk_id = user_id;
             } else if (user_type == 'senior_resident') {
-                berita.senior_resident_id = user_id;
+                const { senior_resident_id } = await SeniorResident.findOne({
+                    where: { dormitizen_id: user_id },
+                });
+                berita.senior_resident_id = senior_resident_id;
             }
             await berita.save();
 
