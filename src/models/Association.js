@@ -101,6 +101,6 @@ Helpdesk.hasMany(Berita, {
 Berita.belongsTo(SeniorResident, {
     foreignKey: 'senior_resident_id',
 });
-Helpdesk.hasMany(SeniorResident, {
+SeniorResident.hasMany(Berita, {
     foreignKey: 'senior_resident_id',
 });
