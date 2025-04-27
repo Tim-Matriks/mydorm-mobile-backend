@@ -1,5 +1,6 @@
 const { Sequelize } = require('sequelize');
 const db = require('../configs/database.js');
+const SeniorResident = require('./SeniorResident.js');
 
 const { DataTypes } = Sequelize;
 
@@ -23,7 +24,7 @@ const Berita = db.define('berita', {
     senior_resident_id: {
         type: DataTypes.BIGINT,
         references: {
-            model: 'senior_resident',
+            model: SeniorResident,
             key: 'senior_resident_id',
         },
     },
