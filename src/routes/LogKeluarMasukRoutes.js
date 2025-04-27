@@ -5,8 +5,9 @@ const LogKeluarMasukController = require('../controllers/LogKeluarMasukControlle
 
 router.get('/', LogKeluarMasukController.getAllLogKeluarMasukByUser);
 router.get('/status', LogKeluarMasukController.cekStatus);
-router.get('/keluar', LogKeluarMasukController.requestKeluar);
-router.get('/masuk', LogKeluarMasukController.requestMasuk);
 router.put('/status/:aksi/:id', LogKeluarMasukController.ubahStatus);
+router.post('/keluar', LogKeluarMasukController.requestKeluar);
+router.post('/masuk', LogKeluarMasukController.requestMasuk);
+router.post('/request', LogKeluarMasukController.handleRequestKeluarMasuk);
 
 module.exports = router;
