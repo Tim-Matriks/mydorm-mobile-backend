@@ -15,12 +15,11 @@ const getAllBerita = async (req, res) => {
 
 const createBerita = async (req, res) => {
     const user_id = req.user_id;
-    const user_type = req.type;
-
+    const user_type = req.user_type;
     try {
         upload(req, res, async (err) => {
             const berita = await Berita.build(req.body);
-            berita.berita.gambar = req.file?.filename;
+            berita.gambar = req.file?.filename;
             if (user_type == 'helpdesk') {
                 berita.helpdesk_id = user_id;
             } else if (user_type == 'senior_resident') {
