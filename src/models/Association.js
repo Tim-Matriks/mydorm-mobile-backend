@@ -98,3 +98,9 @@ Berita.belongsTo(Helpdesk, {
 Helpdesk.hasMany(Berita, {
     foreignKey: 'helpdesk_id',
 });
+Berita.belongsTo(SeniorResident, {
+    foreignKey: 'senior_resident_id',
+});
+Helpdesk.hasMany(SeniorResident, {
+    foreignKey: 'senior_resident_id',
+});

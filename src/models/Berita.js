@@ -20,6 +20,13 @@ const Berita = db.define('berita', {
             key: 'helpdesk_id',
         },
     },
+    senior_resident_id: {
+        type: DataTypes.BIGINT,
+        references: {
+            model: 'senior_resident',
+            key: 'senior_resident_id',
+        },
+    },
 });
 
 module.exports = Berita;
