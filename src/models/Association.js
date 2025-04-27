@@ -1,13 +1,29 @@
-const Berita = require('./Berita');
-const Dormitizen = require('./Dormitizen');
 const Gedung = require('./Gedung');
 const Helpdesk = require('./Helpdesk');
 const Kamar = require('./Kamar');
+const Dormitizen = require('./Dormitizen');
+const SeniorResident = require('./SeniorResident');
+const Berita = require('./Berita');
 const Laporan = require('./Laporan');
 const LogKeluarMasuk = require('./LogKeluarMasuk');
 const Paket = require('./Paket');
 const Pelanggaran = require('./Pelanggaran');
-const SeniorResident = require('./SeniorResident');
+
+// Relasi tiap gedung punya beberapa helpdesk
+Helpdesk.belongsTo(Gedung, {
+    foreignKey: 'helpdesk_id',
+});
+Gedung.hasMany(Helpdesk, {
+    foreignKey: 'helpdesk_id',
+});
+
+// Relasi tiap gedung punya beberapa helpdesk
+Helpdesk.belongsTo(Gedung, {
+    foreignKey: 'helpdesk_id',
+});
+Gedung.hasMany(Helpdesk, {
+    foreignKey: 'helpdesk_id',
+});
 
 // Relasi tiap gedung punya beberapa helpdesk
 Helpdesk.belongsTo(Gedung, {
@@ -66,9 +82,11 @@ Paket.belongsTo(Dormitizen, {
 });
 Paket.belongsTo(Helpdesk, {
     foreignKey: 'penerima_paket',
+    as: 'penerima paket',
 });
 Paket.belongsTo(Helpdesk, {
     foreignKey: 'penyerahan_paket',
+    as: 'penyerahan paket',
 });
 
 // Relasi tiap pelanggaran punya pelanggar dan pelapor

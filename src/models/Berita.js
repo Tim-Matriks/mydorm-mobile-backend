@@ -12,6 +12,7 @@ const Berita = db.define('berita', {
     judul: DataTypes.STRING(100),
     isi: DataTypes.TEXT,
     kategori: DataTypes.STRING(50),
+    gambar: DataTypes.STRING(50),
     helpdesk_id: {
         type: DataTypes.BIGINT,
         references: {
