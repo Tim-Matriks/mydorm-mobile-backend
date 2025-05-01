@@ -15,9 +15,9 @@ app.use(express.static('public'));
 // Untuk mengatur relasi antar tabel
 require('./src/models/Association.js');
 
-// (async () => {
-//     await db.sync();
-// })();
+(async () => {
+    await db.sync();
+})();
 app.use('/', require('./src/routes/AuthRoutes.js'));
 app.use('/helpdesk', require('./src/routes/HelpdeskAuthRoutes.js'));
 app.use('/user', verifyJWT, require('./src/routes/DormitizenRoutes.js'));
