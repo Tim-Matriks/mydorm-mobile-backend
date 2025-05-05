@@ -3,6 +3,8 @@ const sequelize = require('../configs/database.js');
 const SeniorResident = require('../models/SeniorResident.js');
 const Dormitizen = require('../models/Dormitizen');
 const Kamar = require('../models/Kamar');
+const { Op } = require("sequelize");
+
 
 const getAllLogKeluarMasukByUser = async (req, res) => {
     const user_id = req.user_id;
@@ -128,11 +130,39 @@ const ubahStatus = async (req, res) => {
             value = { status, helpdesk_id: user_id };
         }
 
+        const logData = await LogKeluarMasuk.findOne({
+            where: {log_keluar_masuk_id: log_id},
+        });
+
+        const penghuniKamar = await Dormitizen.findOne({
+            where: {dormitizen_id: logData.dormitizen_id}
+        })
+
+        if (logData.aktivitas == 'masuk' && status == 'diterima') {
+            await Kamar.update(
+                {
+                    status: 'terbuka'
+                },
+                {
+                    where: {kamar_id: penghuniKamar.kamar_id}
+                }
+            )
+        } else if (logData.aktivitas == 'keluar' && status == 'diterima') {
+            await Kamar.update(
+                {
+                    status: 'terkunci'
+                },
+                {
+                    where: {kamar_id: penghuniKamar.kamar_id}
+                }
+            )
+        }
+
         const log = await LogKeluarMasuk.update(value, {
             where: { log_keluar_masuk_id: log_id },
         });
 
-        res.status(200).json({
+        return res.status(200).json({
             message: `Update berhasil. Request keluar-masuk ${status}`,
             data: log,
         });
@@ -146,20 +176,29 @@ const handleRequestKeluarMasuk = async (req, res) => {
     const user_id = req.user_id;
 
     try {
-        // Step 1: Cari Dormitizen
         const user = await Dormitizen.findOne({
             where: { dormitizen_id: user_id },
         });
 
-        if (!user) {
-            return res.status(404).json({ message: 'User tidak ditemukan', data: null });
-        }
-
-        // Step 2: Ambil kamar_id dari Dormitizen
         const kamarId = user.kamar_id;
 
-        if (!kamarId) {
-            return res.status(400).json({ message: 'User belum memiliki kamar', data: null });
+        const penghuniKamar = await Dormitizen.findAll({
+            where: {kamar_id: kamarId},
+        })
+
+        const idDormitizens = penghuniKamar.map(p => p.dormitizen_id);
+
+        const cekStatusLogKeluarMasuk = await LogKeluarMasuk.findAll({
+            where: {
+                dormitizen_id: {
+                    [Op.in]: idDormitizens
+                },
+                status: "pending",
+            },
+        })
+
+        if (cekStatusLogKeluarMasuk.length > 0) {
+            return res.status(400).json({ message: 'Terdapat request log keluar masuk dari kamar ini yang masih berstatus pending '})
         }
 
         // Step 3: Cari Kamar berdasarkan kamar_id
