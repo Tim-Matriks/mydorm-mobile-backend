@@ -4,7 +4,9 @@ const upload = require('../middleware/multer.js').single('gambar');
 
 const getAllBerita = async (req, res) => {
     try {
-        const response = await Berita.findAll();
+        const response = await Berita.findAll({
+            order: [['created_at', 'DESC']],
+        });
         res.json({
             message: `Data berita berhasil diambil`,
             data: response,
