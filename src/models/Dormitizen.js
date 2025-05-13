@@ -12,7 +12,6 @@ const Dormitizen = db.define('dormitizen', {
     nim: { type: DataTypes.STRING(12), allowNull: false },
     nama: { type: DataTypes.STRING(100), allowNull: false },
     prodi: { type: DataTypes.STRING(50), allowNull: false },
-    prodi: { type: DataTypes.STRING(50), allowNull: false },
     agama: { type: DataTypes.STRING(20), allowNull: false },
     no_hp: { type: DataTypes.STRING(25), allowNull: false },
     no_hp_ortu: { type: DataTypes.STRING(25), allowNull: false },
