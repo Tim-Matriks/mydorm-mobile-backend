@@ -1,7 +1,6 @@
 const Dormitizen = require('../models/Dormitizen.js');
 const Kamar = require('../models/Kamar.js');
 const Pelanggaran = require('../models/Pelanggaran.js');
-const SeniorResident = require('../models/SeniorResident.js');
 const upload = require('../middleware/multer.js').single('gambar');
 
 const getAllPelanggaran = async (req, res) => {

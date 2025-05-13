@@ -13,11 +13,12 @@ app.use(cookieParser());
 app.use(express.static('public'));
 
 // Untuk mengatur relasi antar tabel
-require('./src/models/Association.js');
+require('./src/models');
 
-// (async () => {
-//     await db.sync();
-// })();
+(async () => {
+    await db.sync({});
+    console.log('All models were synchronized successfully.');
+})();
 app.use('/', require('./src/routes/AuthRoutes.js'));
 app.use('/helpdesk', require('./src/routes/HelpdeskAuthRoutes.js'));
 app.use('/user', verifyJWT, require('./src/routes/DormitizenRoutes.js'));

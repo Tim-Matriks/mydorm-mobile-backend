@@ -1,7 +1,6 @@
 const LogKeluarMasuk = require('../models/LogKeluarMasuk.js');
 const sequelize = require('../configs/database.js');
-const SeniorResident = require('../models/SeniorResident.js');
-const Dormitizen = require('../models/Dormitizen');
+const Dormitizen = require('../models/Dormitizen.js');
 const Kamar = require('../models/Kamar');
 
 const getAllLogKeluarMasukByUser = async (req, res) => {
@@ -140,8 +139,8 @@ const ubahStatus = async (req, res) => {
         console.error(error);
         res.status(500).json({ message: error.message, data: null });
     }
-}
- 
+};
+
 const handleRequestKeluarMasuk = async (req, res) => {
     const user_id = req.user_id;
 
@@ -152,14 +151,18 @@ const handleRequestKeluarMasuk = async (req, res) => {
         });
 
         if (!user) {
-            return res.status(404).json({ message: 'User tidak ditemukan', data: null });
+            return res
+                .status(404)
+                .json({ message: 'User tidak ditemukan', data: null });
         }
 
         // Step 2: Ambil kamar_id dari Dormitizen
         const kamarId = user.kamar_id;
 
         if (!kamarId) {
-            return res.status(400).json({ message: 'User belum memiliki kamar', data: null });
+            return res
+                .status(400)
+                .json({ message: 'User belum memiliki kamar', data: null });
         }
 
         // Step 3: Cari Kamar berdasarkan kamar_id
@@ -168,7 +171,9 @@ const handleRequestKeluarMasuk = async (req, res) => {
         });
 
         if (!kamar) {
-            return res.status(404).json({ message: 'Kamar tidak ditemukan', data: null });
+            return res
+                .status(404)
+                .json({ message: 'Kamar tidak ditemukan', data: null });
         }
 
         const kamarStatus = kamar.status; // 'terkunci' atau 'terbuka'
@@ -187,7 +192,6 @@ const handleRequestKeluarMasuk = async (req, res) => {
                 message: 'Request masuk berhasil dibuat',
                 data: request,
             });
-
         } else if (kamarStatus === 'terbuka') {
             // Request keluar
             const request = await LogKeluarMasuk.create({
@@ -201,11 +205,12 @@ const handleRequestKeluarMasuk = async (req, res) => {
                 message: 'Request keluar berhasil dibuat',
                 data: request,
             });
-
         } else {
-            res.status(400).json({ message: 'Status kamar tidak valid', data: null });
+            res.status(400).json({
+                message: 'Status kamar tidak valid',
+                data: null,
+            });
         }
-
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: error.message, data: null });

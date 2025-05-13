@@ -5,17 +5,21 @@ const { DataTypes } = Sequelize;
 
 const Helpdesk = db.define('helpdesk', {
     helpdesk_id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
-        autoIncrement: true,
     },
-    nip: DataTypes.STRING(18),
-    nama: DataTypes.STRING(100),
-    username: DataTypes.STRING(100),
-    password: DataTypes.STRING(100),
-    refresh_token: DataTypes.STRING,
+    nip: { type: DataTypes.STRING(18), allowNull: false },
+    nama: { type: DataTypes.STRING(100), allowNull: false },
+    user_id: {
+        type: DataTypes.UUID,
+        references: {
+            model: 'user',
+            key: 'user_id',
+        },
+    },
     gedung_id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.UUID,
         references: {
             model: 'gedung',
             key: 'gedung_id',

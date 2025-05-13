@@ -2,7 +2,6 @@ const { Op } = require('sequelize');
 const Dormitizen = require('../models/Dormitizen.js');
 const Gedung = require('../models/Gedung.js');
 const Kamar = require('../models/Kamar.js');
-const SeniorResident = require('../models/SeniorResident.js');
 
 const getLoggedInUser = async (req, res) => {
     const user_id = req.user_id;
