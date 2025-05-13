@@ -3,12 +3,12 @@ const router = express.Router();
 
 const registerController = require('../controllers/auth/registerController.js');
 const loginController = require('../controllers/auth/loginController.js');
+const logoutController = require('../controllers/auth/logoutController.js');
 // const refreshTokenController = require('../controllers/auth/refreshTokenController');
-// const logoutController = require('../controllers/auth/dormitizen/logoutController.js');
 
 router.post('/register', registerController);
 router.post('/login', loginController);
+router.get('/logout', logoutController);
 // router.get('/refresh', refreshTokenController);
-// router.get('/logout', logoutController);
 
 module.exports = router;
