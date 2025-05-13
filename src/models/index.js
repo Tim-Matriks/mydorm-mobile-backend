@@ -24,6 +24,12 @@ User.hasOne(Dormitizen, {
 User.hasOne(Helpdesk, {
     foreignKey: 'user_id',
 });
+Dormitizen.belongsTo(User, {
+    foreignKey: 'user_id',
+});
+Helpdesk.belongsTo(User, {
+    foreignKey: 'user_id',
+});
 
 // Dalam satu gedung, ada banyak kamar
 Gedung.hasMany(Kamar, {
