@@ -16,10 +16,11 @@ app.use(express.static('public'));
 require('./src/models');
 
 (async () => {
-    await db.sync({});
+    await db.sync();
     console.log('All models were synchronized successfully.');
 })();
 app.use('/', require('./src/routes/AuthRoutes.js'));
+app.use('/', require('./src/routes/importRoutes.js'));
 app.use('/helpdesk', require('./src/routes/HelpdeskAuthRoutes.js'));
 app.use('/user', verifyJWT, require('./src/routes/DormitizenRoutes.js'));
 app.use('/laporan', verifyJWT, require('./src/routes/LaporanRoutes.js'));
