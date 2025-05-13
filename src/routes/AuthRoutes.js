@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 
-const registerController = require('../controllers/auth/register-controller.js');
-// const loginController = require('../controllers/auth/dormitizen/loginController.js');
+const registerController = require('../controllers/auth/registerController.js');
+const loginController = require('../controllers/auth/loginController.js');
 // const refreshTokenController = require('../controllers/auth/refreshTokenController');
 // const logoutController = require('../controllers/auth/dormitizen/logoutController.js');
 
 router.post('/register', registerController);
-// router.post('/login', loginController);
+router.post('/login', loginController);
 // router.get('/refresh', refreshTokenController);
 // router.get('/logout', logoutController);
 
