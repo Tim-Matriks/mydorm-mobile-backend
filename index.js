@@ -5,6 +5,8 @@ const cors = require('cors');
 const db = require('./src/configs/database.js');
 const cookieParser = require('cookie-parser');
 const verifyJWT = require('./src/middleware/verifyJWT.js');
+const errorHandler = require('./src/middleware/error/errorHandler.js');
+const notFoundHandler = require('./src/middleware/error/notFoundHandler.js');
 const app = express();
 
 app.use(cors());
@@ -37,6 +39,9 @@ app.use(
     verifyJWT,
     require('./src/routes/LogKeluarMasukRoutes.js')
 );
+
+app.use(errorHandler);
+app.use(notFoundHandler);
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
