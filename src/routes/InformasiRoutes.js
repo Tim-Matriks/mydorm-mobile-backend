@@ -3,6 +3,8 @@ const router = express.Router();
 
 const uploadFotoInformasi = require('../middleware/upload/imageInformasi.js');
 
+const uploadFotoInformasi = require('../middleware/upload/imageInformasi.js');
+
 const {
     getAllInformasi,
     createInformasi,
