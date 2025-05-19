@@ -26,7 +26,7 @@ app.use('/', require('./src/routes/importRoutes.js'));
 app.use('/helpdesk', require('./src/routes/HelpdeskAuthRoutes.js'));
 app.use('/user', verifyJWT, require('./src/routes/DormitizenRoutes.js'));
 app.use('/laporan', verifyJWT, require('./src/routes/LaporanRoutes.js'));
-app.use('/berita', verifyJWT, require('./src/routes/BeritaRoutes.js'));
+app.use('/informasi', verifyJWT, require('./src/routes/InformasiRoutes.js'));
 app.use('/paket', verifyJWT, require('./src/routes/PaketRoutes.js'));
 app.use('/kamar', verifyJWT, require('./src/routes/KamarRoutes.js'));
 app.use(

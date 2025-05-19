@@ -18,8 +18,10 @@ const verifyJWT = (req, res, next) => {
             return res
                 .status(403)
                 .json({ message: 'Invalid or expired token' });
-        req.user_id = decoded.user_id;
-        req.user_type = decoded.type;
+        req.loginData = {
+            user_id: decoded.user_id,
+            user_role: decoded.role,
+        };
         next();
     });
 };

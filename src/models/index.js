@@ -6,6 +6,7 @@ const Gedung = require('./Gedung');
 const Kamar = require('./Kamar');
 const Dormitizen = require('./Dormitizen');
 const Helpdesk = require('./Helpdesk');
+const Informasi = require('./Informasi');
 
 module.exports = {
     Sequelize,
@@ -51,4 +52,13 @@ Kamar.hasMany(Dormitizen, {
 Dormitizen.belongsTo(Kamar, {
     foreignKey: 'kamar_id',
     as: 'kamar',
+});
+
+User.hasMany(Informasi, {
+    foreignKey: 'penulis_id',
+    as: 'membuat informasi',
+});
+Informasi.belongsTo(User, {
+    foreignKey: 'penulis_id',
+    as: 'penulis',
 });
