@@ -13,6 +13,11 @@ const db = new Sequelize(
             createdAt: 'created_at',
             updatedAt: 'updated_at',
         },
+        dialectOptions: {
+            dateStrings: true,
+            typeCast: true,
+            timezone: '+07:00',
+        },
     }
 );
 
