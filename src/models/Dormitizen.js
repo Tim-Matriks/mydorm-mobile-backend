@@ -20,6 +20,7 @@ const Dormitizen = db.define('dormitizen', {
     alamat_ortu: DataTypes.STRING(100),
     gambar: DataTypes.STRING,
     refresh_token: DataTypes.STRING,
+    fcm_token: DataTypes.STRING(512),
     kamar_id: {
         type: DataTypes.BIGINT,
         references: {
