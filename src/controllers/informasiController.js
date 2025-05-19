@@ -49,6 +49,32 @@ const getAllInformasi = async (req, res) => {
     }
 };
 
+const createInformasi = async (req, res) => {
+    const { user_id } = req.loginData;
+    const { judul, isi, kategori } = req.body;
+
+    try {
+        const newInformasi = await Informasi.create({
+            judul,
+            isi,
+            kategori,
+            gambar: req.file.filename,
+            penulis_id: user_id,
+        });
+        res.status(201).json({
+            message: 'Informasi berhasil dibuat',
+            data: newInformasi,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Terjadi kesalahan saat menambah informasi',
+            errMsg: error.message,
+        });
+    }
+};
+
 module.exports = {
     getAllInformasi,
+    createInformasi,
 };
