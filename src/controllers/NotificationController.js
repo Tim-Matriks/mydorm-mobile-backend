@@ -2,8 +2,9 @@ const Dormitizen = require('../models/Dormitizen.js');
 const admin = require('../../firebase.js')
 
 const saveToken = async (req, res) => {
-    const { dormitizen_id, fcm_token } = req.body;
-  
+    const { fcm_token } = req.body;
+    const dormitizen_id = req.user_id;
+
     if (!dormitizen_id || !fcm_token) {
       return res.status(400).json({ message: 'dormitizen_id dan token wajib diisi' });
     }
@@ -28,8 +29,8 @@ const saveToken = async (req, res) => {
   };
 
   const deleteToken = async (req, res) => {
-    const { dormitizen_id } = req.paramschat;
-  
+    const dormitizen_id = req.user_id;
+    
     if (!dormitizen_id) {
       return res.status(400).json({ message: 'dormitizen_id wajib disertakan di URL' });
     }
