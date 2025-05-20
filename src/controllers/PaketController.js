@@ -1,4 +1,5 @@
 const { Paket, Dormitizen, Helpdesk, User } = require('../models');
+const deleteFile = require('../utils/fileHelpers');
 const userRoleDetails = require('../utils/userRoleDetail');
 const dayjs = require('dayjs');
 
@@ -135,9 +136,37 @@ const updatePaket = async (req, res) => {
     }
 };
 
+const deletePaket = async (req, res) => {
+    const paket_id = req.params.id;
+
+    try {
+        const paket = await Paket.findByPk(paket_id);
+
+        if (!paket) {
+            return res.status(404).json({
+                message: 'Data paket tidak ditemukan',
+            });
+        }
+
+        deleteFile('images/paket', paket.gambar);
+        await paket.destroy();
+
+        res.status(200).json({
+            message: 'Paket berhasil dihapus',
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Terjadi kesalahan saat menghapus paket',
+            errMsg: error.message,
+        });
+    }
+};
+
 module.exports = {
     getAllPaket,
     getAllPaketByUser,
     createPaket,
     updatePaket,
+    deletePaket,
 };
