@@ -1,5 +1,6 @@
 const { User, Dormitizen, Helpdesk } = require('../models');
 const Informasi = require('../models/Informasi');
+const deleteFile = require('../utils/fileHelpers');
 
 const getAllInformasi = async (req, res) => {
     try {
@@ -116,24 +117,15 @@ const updateInformasi = async (req, res) => {
         const oldInformasi = await Informasi.findByPk(informasi_id);
 
         if (!oldInformasi) {
+            if (req.file) deleteFile('images/informasi', req.file.filename);
             return res.status(404).json({
                 message: 'Data informasi tidak ditemukan',
             });
         }
 
-        let imagePath = oldInformasi.image;
+        let imagePath = oldInformasi.gambar;
         if (req.file) {
-            if (oldInformasi.image) {
-                const oldPath = path.join(
-                    __dirname,
-                    '..',
-                    'uploads/images/informasi',
-                    oldInformasi.image
-                );
-                if (fs.existsSync(oldPath)) {
-                    fs.unlinkSync(oldPath);
-                }
-            }
+            deleteFile('images/informasi', imagePath);
             imagePath = req.file.filename;
         }
 
@@ -157,8 +149,36 @@ const updateInformasi = async (req, res) => {
     }
 };
 
+const deleteInformasi = async (req, res) => {
+    const informasi_id = req.params.id;
+
+    try {
+        const informasi = await Informasi.findByPk(informasi_id);
+
+        if (!informasi) {
+            return res.status(404).json({
+                message: 'Data informasi tidak ditemukan',
+            });
+        }
+
+        deleteFile('images/informasi', informasi.gambar);
+        await informasi.destroy();
+
+        res.status(200).json({
+            message: 'Informasi berhasil dihapus',
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Terjadi kesalahan saat menghapus informasi',
+            errMsg: error.message,
+        });
+    }
+};
+
 module.exports = {
     getAllInformasi,
     createInformasi,
     updateInformasi,
+    deleteInformasi,
 };
