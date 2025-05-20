@@ -1,5 +1,6 @@
 const { Paket, Dormitizen, Helpdesk, User } = require('../models');
 const userRoleDetails = require('../utils/userRoleDetail');
+const dayjs = require('dayjs');
 
 const getAllPaket = async (req, res) => {
     try {
@@ -94,9 +95,49 @@ const createPaket = async (req, res) => {
     }
 };
 
+const updatePaket = async (req, res) => {
+    const paket_id = req.params.id;
+    const { user_id, user_role } = req.loginData;
+    const userDetail = await userRoleDetails(user_id, user_role);
+
+    if (user_role != 'helpdesk') {
+        return res.status(403).json({
+            message: 'Hanya untuk helpdesk',
+        });
+    }
+
+    try {
+        penyerah_paket_id = userDetail.helpdesk_id ?? null;
+        const oldPaket = await Paket.findByPk(paket_id);
+
+        if (!oldPaket) {
+            return res.status(404).json({
+                message: 'Data paket tidak ditemukan',
+            });
+        }
+
+        await oldPaket.update({
+            waktu_diambil: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+            status_pengambilan: 'sudah',
+            penyerah_paket_id,
+        });
+
+        res.status(200).json({
+            message: 'Paket berhasil diubah',
+            data: oldPaket,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Terjadi kesalahan saat mengubah paket',
+            errMsg: error.message,
+        });
+    }
+};
+
 module.exports = {
     getAllPaket,
     getAllPaketByUser,
     createPaket,
-    // getUserPaket,
+    updatePaket,
 };

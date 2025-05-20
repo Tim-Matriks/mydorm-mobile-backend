@@ -7,10 +7,12 @@ const {
     getAllPaket,
     getAllPaketByUser,
     createPaket,
+    updatePaket,
 } = require('../controllers/paketController.js');
 
 router.get('/all', getAllPaket);
 router.get('/', getAllPaketByUser);
 router.post('/', uploadFotoPaket.single('gambar'), createPaket);
+router.put('/:id', uploadFotoPaket.single('gambar'), updatePaket);
 
 module.exports = router;
