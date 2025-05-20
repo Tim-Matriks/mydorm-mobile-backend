@@ -11,8 +11,8 @@ const {
 } = require('../controllers/informasiController.js');
 
 router.get('/', getAllInformasi);
-router.post('/', uploadFotoInformasi.single('file'), createInformasi);
-router.put('/:id', uploadFotoInformasi.single('file'), updateInformasi);
+router.post('/', uploadFotoInformasi.single('gambar'), createInformasi);
+router.put('/:id', uploadFotoInformasi.single('gambar'), updateInformasi);
 router.delete('/:id', deleteInformasi);
 
 module.exports = router;

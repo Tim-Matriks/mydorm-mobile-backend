@@ -7,6 +7,7 @@ const Kamar = require('./Kamar');
 const Dormitizen = require('./Dormitizen');
 const Helpdesk = require('./Helpdesk');
 const Informasi = require('./Informasi');
+const Paket = require('./Paket');
 
 module.exports = {
     Sequelize,
@@ -16,6 +17,7 @@ module.exports = {
     Kamar,
     Dormitizen,
     Helpdesk,
+    Paket,
 };
 
 // Tiap user merupakan seorang dormitizen atau helpdesk
@@ -54,11 +56,27 @@ Dormitizen.belongsTo(Kamar, {
     as: 'kamar',
 });
 
+// Seorang user bisa menulis banyak informasi
 User.hasMany(Informasi, {
     foreignKey: 'penulis_id',
-    as: 'membuat informasi',
+    as: 'membuat_informasi',
 });
+// Tiap informasi ditulis oleh seorang user
 Informasi.belongsTo(User, {
     foreignKey: 'penulis_id',
     as: 'penulis',
+});
+
+// Relasi paket dengan user
+Paket.belongsTo(Dormitizen, {
+    foreignKey: 'pemilik_paket_id',
+    as: 'pemilik_paket',
+});
+Paket.belongsTo(Helpdesk, {
+    foreignKey: 'penerima_paket_id',
+    as: 'penerima_paket',
+});
+Paket.belongsTo(Helpdesk, {
+    foreignKey: 'penyerah_paket_id',
+    as: 'penyerah_paket',
 });

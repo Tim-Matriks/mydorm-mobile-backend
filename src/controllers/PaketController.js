@@ -1,138 +1,49 @@
-const upload = require('../middleware/multer.js').single('gambar');
-const Dormitizen = require('../models/Dormitizen.js');
-const Helpdesk = require('../models/Helpdesk.js');
-const Kamar = require('../models/Kamar.js');
-const Paket = require('../models/Paket.js');
+const { Paket, Dormitizen, Helpdesk, User } = require('../models');
+const userRoleDetails = require('../utils/userRoleDetail');
 
 const getAllPaket = async (req, res) => {
     try {
-        const response = await Paket.findAll({
-            attributes: {
-                exclude: [
-                    'penerima_paket',
-                    'penyerahan_paket',
-                    'dormitizen_id',
-                    'created_at',
-                    'updated_at',
-                ],
-            },
+        // TODO: Rapihin output agar tidak kebanyakan data
+        const allPaket = await Paket.findAll({
             include: [
-                {
-                    model: Dormitizen,
-                    attributes: {
-                        exclude: [
-                            'password',
-                            'refresh_token',
-                            'kamar_id',
-                            'created_at',
-                            'updated_at',
-                        ],
-                    },
-                    include: {
-                        model: Kamar,
-                        attributes: {
-                            exclude: ['created_at', 'updated_at', 'gedung_id'],
-                        },
-                    },
-                },
-                {
-                    model: Helpdesk,
-                    as: 'penerima paket',
-                    attributes: {
-                        exclude: [
-                            'password',
-                            'refresh_token',
-                            'created_at',
-                            'updated_at',
-                        ],
-                    },
-                },
-                {
-                    model: Helpdesk,
-                    as: 'penyerahan paket',
-                    attributes: {
-                        exclude: [
-                            'password',
-                            'refresh_token',
-                            'created_at',
-                            'updated_at',
-                        ],
-                    },
-                },
+                { model: Dormitizen, as: 'pemilik_paket' },
+                { model: Helpdesk, as: 'penerima_paket' },
+                { model: Helpdesk, as: 'penyerah_paket' },
             ],
         });
-        res.json({
-            message: `Data semua paket berhasil diambil`,
-            data: response,
+
+        return res.json({
+            message: 'Berhasil mengambil daftar informasi',
+            data: allPaket,
         });
     } catch (error) {
-        res.status(500).json({ message: error.message, data: null });
+        console.error(error);
+        return res.status(500).json({
+            message: 'Terjadi kesalahan saat mengambil daftar semua paket',
+            errMsg: error.message,
+        });
     }
 };
 
-const getUserPaket = async (req, res) => {
-    const user_id = req.user_id;
+const getAllPaketByUser = async (req, res) => {
+    const { user_id, user_role } = req.loginData;
+    const userDetail = await userRoleDetails(user_id, user_role);
 
     try {
-        const response = await Paket.findAll({
-            attributes: {
-                exclude: [
-                    'penerima_paket',
-                    'penyerahan_paket',
-                    'dormitizen_id',
-                    'created_at',
-                    'updated_at',
-                ],
-            },
-            where: { dormitizen_id: user_id },
+        pemilik_paket_id = userDetail.dormitizen_id ?? null;
+
+        const allPaket = await Paket.findAll({
             include: [
-                {
-                    model: Dormitizen,
-                    attributes: {
-                        exclude: [
-                            'password',
-                            'refresh_token',
-                            'kamar_id',
-                            'created_at',
-                            'updated_at',
-                        ],
-                    },
-                    include: {
-                        model: Kamar,
-                        attributes: {
-                            exclude: ['created_at', 'updated_at', 'gedung_id'],
-                        },
-                    },
-                },
-                {
-                    model: Helpdesk,
-                    as: 'penerima paket',
-                    attributes: {
-                        exclude: [
-                            'password',
-                            'refresh_token',
-                            'created_at',
-                            'updated_at',
-                        ],
-                    },
-                },
-                {
-                    model: Helpdesk,
-                    as: 'penyerahan paket',
-                    attributes: {
-                        exclude: [
-                            'password',
-                            'refresh_token',
-                            'created_at',
-                            'updated_at',
-                        ],
-                    },
-                },
+                { model: Dormitizen, as: 'pemilik_paket' },
+                { model: Helpdesk, as: 'penerima_paket' },
+                { model: Helpdesk, as: 'penyerah_paket' },
             ],
+            where: { pemilik_paket_id },
         });
+
         res.json({
             message: `Data semua paket user berhasil diambil`,
-            data: response,
+            data: allPaket,
         });
     } catch (error) {
         res.status(500).json({ message: error.message, data: null });
@@ -140,43 +51,52 @@ const getUserPaket = async (req, res) => {
 };
 
 const createPaket = async (req, res) => {
-    const user_id = req.user_id;
-    const user_type = req.user_type;
+    const { user_id, user_role } = req.loginData;
+    const userDetail = await userRoleDetails(user_id, user_role);
+    const { status_pengambilan, waktu_tiba, dormitizen_id } = req.body;
+
+    if (
+        !status_pengambilan ||
+        !waktu_tiba ||
+        !dormitizen_id ||
+        !req.file?.filename
+    ) {
+        return res.status(400).json({
+            message: 'Semua field wajib diisi',
+        }); // TODO: Menambah cek file (simbol ?) juga di method lain
+    }
+
+    if (user_role != 'helpdesk') {
+        return res.status(403).json({
+            message: 'Hanya untuk helpdesk',
+        });
+    }
 
     try {
-        upload(req, res, async (err) => {
-            if (user_type != 'helpdesk') {
-                return res.status(403).json({
-                    message: 'Harus login sebagai helpdesk',
-                    data: null,
-                });
-            }
-            if (err?.code === 'LIMIT_FILE_SIZE') {
-                return res
-                    .status(413)
-                    .json({ message: 'File terlalu besar. Max 5MB' });
-            }
-
-            const paket = await Paket.build(req.body);
-            paket.penerima_paket = user_id;
-            paket.gambar = req.file?.filename;
-
-            await paket.save();
-
-            const response = paket;
-
-            res.json({
-                message: `Data paket berhasil ditambahkan`,
-                data: response,
-            });
+        penerima_paket_id = userDetail.helpdesk_id ?? null;
+        const newPaket = await Paket.create({
+            status_pengambilan,
+            waktu_tiba,
+            pemilik_paket_id: dormitizen_id,
+            gambar: req.file.filename,
+            penerima_paket_id,
+        });
+        res.status(201).json({
+            message: 'Data paket berhasil dibuat',
+            data: newPaket,
         });
     } catch (error) {
-        res.status(500).json({ message: error.message, data: null });
+        console.error(error);
+        return res.status(500).json({
+            message: 'Terjadi kesalahan saat menambah data paket',
+            errMsg: error.message,
+        });
     }
 };
 
 module.exports = {
     getAllPaket,
-    getUserPaket,
+    getAllPaketByUser,
     createPaket,
+    // getUserPaket,
 };
