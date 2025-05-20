@@ -1,6 +1,7 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const dayjs = require('dayjs');
 
 function createUploadMiddleware({ folder, prefix, maxSize, allowedFileType }) {
     const storage = multer.diskStorage({
@@ -11,7 +12,8 @@ function createUploadMiddleware({ folder, prefix, maxSize, allowedFileType }) {
         },
         filename: (req, file, cb) => {
             const ext = path.extname(file.originalname);
-            const uniqueName = `${prefix}-${Date.now()}${ext}`;
+            const timestamp = dayjs().format('YYYYMMDDHHmmss');
+            const uniqueName = `${prefix}-${timestamp}${ext}`;
             cb(null, uniqueName);
         },
     });
