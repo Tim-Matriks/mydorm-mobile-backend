@@ -8,6 +8,7 @@ const Dormitizen = require('./Dormitizen');
 const Helpdesk = require('./Helpdesk');
 const Informasi = require('./Informasi');
 const Paket = require('./Paket');
+const Pelanggaran = require('./Pelanggaran');
 
 module.exports = {
     Sequelize,
@@ -18,6 +19,7 @@ module.exports = {
     Dormitizen,
     Helpdesk,
     Paket,
+    Pelanggaran,
 };
 
 // Tiap user merupakan seorang dormitizen atau helpdesk
@@ -79,4 +81,14 @@ Paket.belongsTo(Helpdesk, {
 Paket.belongsTo(Helpdesk, {
     foreignKey: 'penyerah_paket_id',
     as: 'penyerah_paket',
+});
+
+// Senior resident melapor pelanggaran dormitizen
+Pelanggaran.belongsTo(Dormitizen, {
+    foreignKey: 'pelapor_id',
+    as: 'pelapor',
+});
+Pelanggaran.belongsTo(Dormitizen, {
+    foreignKey: 'pelanggar_id',
+    as: 'pelanggar',
 });
