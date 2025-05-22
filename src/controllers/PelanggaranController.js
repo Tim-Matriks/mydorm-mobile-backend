@@ -1,4 +1,5 @@
 const { Pelanggaran, Dormitizen } = require('../models');
+const deleteFile = require('../utils/fileHelpers');
 const userRoleDetails = require('../utils/userRoleDetail');
 
 const getAllPelanggaran = async (req, res) => {
@@ -132,28 +133,32 @@ const createPelanggaran = async (req, res) => {
     }
 };
 
-// const deletePelanggaran = async (req, res) => {
-//     const user_type = req.user_type;
-//     const { pelanggaran_id } = req.params;
+const deletePelanggaran = async (req, res) => {
+    const pelanggaran_id = req.params.id;
 
-//     try {
-//         if (user_type != 'senior_resident') {
-//             return res.status(403).json({
-//                 message: 'Harus login sebagai senior resident',
-//                 data: null,
-//             });
-//         }
+    try {
+        const pelanggaran = await Pelanggaran.findByPk(pelanggaran_id);
 
-//         await Pelanggaran.destroy({ where: { pelanggaran_id } });
+        if (!pelanggaran) {
+            return res.status(404).json({
+                message: 'Data pelanggaran tidak ditemukan',
+            });
+        }
 
-//         res.status(200).json({
-//             message: 'Pelanggaran berhasil dihapus',
-//             data: null,
-//         });
-//     } catch (error) {
-//         res.status(500).json({ message: error.message, data: null });
-//     }
-// };
+        deleteFile('images/pelanggaran', pelanggaran.gambar);
+        await pelanggaran.destroy();
+
+        res.status(200).json({
+            message: 'Pelanggaran berhasil dihapus',
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Terjadi kesalahan saat menghapus pelanggaran',
+            errMsg: error.message,
+        });
+    }
+};
 
 module.exports = {
     getAllPelanggaran,
@@ -161,4 +166,5 @@ module.exports = {
     getAllPelanggaranByUserId,
     getAllPelanggaranByKamarId,
     createPelanggaran,
+    deletePelanggaran,
 };
