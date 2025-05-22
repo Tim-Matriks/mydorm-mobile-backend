@@ -1,4 +1,5 @@
 const { Pelanggaran, Dormitizen } = require('../models');
+const userRoleDetails = require('../utils/userRoleDetail');
 
 const getAllPelanggaran = async (req, res) => {
     try {
@@ -71,45 +72,41 @@ const getAllPelanggaranByUserId = async (req, res) => {
     }
 };
 
-// const createPelanggaran = async (req, res) => {
-//     const user_type = req.user_type;
-//     const user_id = req.user_id;
+const createPelanggaran = async (req, res) => {
+    const { kategori, waktu, dormitizen_id } = req.body;
+    const { user_id, user_role } = req.loginData;
+    const { dormitizen_id: senior_resident_id } = await userRoleDetails(
+        user_id,
+        user_role
+    );
 
-//     try {
-//         upload(req, res, async (err) => {
-//             if (user_type != 'senior_resident') {
-//                 return res.status(403).json({
-//                     message: 'Harus login sebagai senior resident',
-//                     data: null,
-//                 });
-//             }
-//             if (err?.code === 'LIMIT_FILE_SIZE') {
-//                 return res
-//                     .status(413)
-//                     .json({ message: 'File terlalu besar. Max 5MB' });
-//             }
+    if (!kategori || !waktu || !dormitizen_id || !req.file?.filename) {
+        return res.status(400).json({
+            message: 'Semua field wajib diisi',
+        });
+    }
 
-//             const { senior_resident_id: sr_id } = await SeniorResident.findOne({
-//                 where: { dormitizen_id: user_id },
-//             });
+    try {
+        const newPelanggaran = await Pelanggaran.create({
+            kategori,
+            waktu,
+            pelapor_id: senior_resident_id,
+            pelanggar_id: dormitizen_id,
+            gambar: req.file.filename,
+        });
 
-//             const pelanggaran = await Pelanggaran.build(req.body);
-//             pelanggaran.senior_resident_id = sr_id;
-//             pelanggaran.gambar = req.file?.filename;
-
-//             await pelanggaran.save();
-
-//             const response = pelanggaran;
-
-//             res.status(201).json({
-//                 message: 'Pelanggaran berhasil dibuat',
-//                 data: response,
-//             });
-//         });
-//     } catch (error) {
-//         res.status(500).json({ message: error.message, data: null });
-//     }
-// };
+        res.status(201).json({
+            message: 'Data pelanggaran berhasil dibuat',
+            data: newPelanggaran,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Terjadi kesalahan saat menambah data pelanggaran',
+            errMsg: error.message,
+        });
+    }
+};
 
 // const deletePelanggaran = async (req, res) => {
 //     const user_type = req.user_type;
@@ -138,4 +135,5 @@ module.exports = {
     getAllPelanggaran,
     getPelanggaranById,
     getAllPelanggaranByUserId,
+    createPelanggaran,
 };
