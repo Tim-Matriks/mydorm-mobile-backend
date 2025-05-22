@@ -72,6 +72,30 @@ const getAllPelanggaranByUserId = async (req, res) => {
     }
 };
 
+const getAllPelanggaranByKamarId = async (req, res) => {
+    const kamar_id = req.params.id;
+
+    try {
+        const pelanggaran = await Pelanggaran.findAll({
+            include: [
+                { model: Dormitizen, as: 'pelapor' },
+                { model: Dormitizen, as: 'pelanggar', where: { kamar_id } },
+            ],
+        });
+        res.json({
+            message: `Data pelanggaran dormitizen sekamar berhasil diambil`,
+            data: pelanggaran,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message:
+                'Terjadi kesalahan saat mengambil data pelanggaran dormitizen sekamar',
+            errMsg: error.message,
+        });
+    }
+};
+
 const createPelanggaran = async (req, res) => {
     const { kategori, waktu, dormitizen_id } = req.body;
     const { user_id, user_role } = req.loginData;
@@ -135,5 +159,6 @@ module.exports = {
     getAllPelanggaran,
     getPelanggaranById,
     getAllPelanggaranByUserId,
+    getAllPelanggaranByKamarId,
     createPelanggaran,
 };

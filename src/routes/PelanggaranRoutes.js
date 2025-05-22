@@ -8,11 +8,13 @@ const {
     getPelanggaranById,
     getAllPelanggaranByUserId,
     createPelanggaran,
+    getAllPelanggaranByKamarId,
 } = require('../controllers/PelanggaranController.js');
 
 router.get('/', getAllPelanggaran);
 router.get('/:id', getPelanggaranById);
 router.get('/user/:id', getAllPelanggaranByUserId);
+router.get('/kamar/:id', getAllPelanggaranByKamarId);
 router.post('/', uploadFotoPelanggaran.single('file'), createPelanggaran);
 // router.delete('/:pelanggaran_id', deletePelanggaran);
 
