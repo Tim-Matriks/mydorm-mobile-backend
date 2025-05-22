@@ -9,7 +9,7 @@ const {
     createPaket,
     updatePaket,
     deletePaket,
-} = require('../controllers/paketController.js');
+} = require('../controllers/PaketController.js');
 
 router.get('/all', getAllPaket);
 router.get('/', getAllPaketByUser);
