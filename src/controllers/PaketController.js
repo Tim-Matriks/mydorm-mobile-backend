@@ -15,7 +15,7 @@ const getAllPaket = async (req, res) => {
         });
 
         return res.json({
-            message: 'Berhasil mengambil daftar informasi',
+            message: 'Berhasil mengambil daftar paket',
             data: allPaket,
         });
     } catch (error) {
