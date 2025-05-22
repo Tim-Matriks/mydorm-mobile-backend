@@ -12,7 +12,9 @@ const errorHandler = (err, req, res, next) => {
         return res.status(400).json({ error: 'Jumlah file terlalu banyak' });
     }
 
-    return res.status(500).json({ error: 'Terjadi kesalahan pada server' });
+    return res
+        .status(500)
+        .json({ error: 'Terjadi kesalahan pada server', errMsg: err.message });
 };
 
 module.exports = errorHandler;
