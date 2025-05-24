@@ -1,6 +1,6 @@
-const { Kamar, Gedung, Dormitizen } = require('../../models');
+const { Kamar, Gedung, Dormitizen, Helpdesk } = require('../../models');
 
-exports.assignKamar = async (req, res) => {
+exports.assignUser = async (req, res) => {
     try {
         // Ambil semua kamar pada semua gedung, urutkan
         // berdasarkan kode gedung dan nomor kamar
@@ -67,8 +67,17 @@ exports.assignKamar = async (req, res) => {
             order: [['nim', 'ASC']],
         });
 
+        // Assign helpdesk ke gedung
+        const semuaGedung = await Gedung.findAll({ order: [['kode', 'ASC']] });
+        const semuaHD = await Helpdesk.findAll({ order: [['nip', 'ASC']] });
+        for (let i = 0; i < semuaHD.length; i++) {
+            await semuaHD[i].update({
+                gedung_id: semuaGedung[i].gedung_id,
+            });
+        }
+
         res.status(200).json({
-            message: 'Assign kamar user berhasil',
+            message: 'Assign user berhasil',
             //data_gedung: semuaKamar,
             //data_dormitizen: semuaDormitizen,
             //data: semuaDormitizenDenganKamar,

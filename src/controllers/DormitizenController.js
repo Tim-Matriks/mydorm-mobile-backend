@@ -12,7 +12,7 @@ const findDormitizenByKamar = async (req, res) => {
             me = await Helpdesk.findOne({
                 where: { user_id },
             });
-            gedung_id = me.gedung.gedung_id;
+            gedung_id = me.gedung_id;
         } else {
             me = await Dormitizen.findOne({
                 where: { user_id },
