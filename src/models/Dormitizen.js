@@ -21,6 +21,11 @@ const Dormitizen = db.define('dormitizen', {
         allowNull: false,
         defaultValue: false,
     },
+    gambar: {
+        type: DataTypes.STRING,
+        defaultValue: 'blank_profile_pic.png',
+        allowNull: false,
+    },
     user_id: {
         type: DataTypes.UUID,
         references: {

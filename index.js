@@ -15,7 +15,7 @@ app.use(cookieParser());
 app.use(express.static('public'));
 
 // Untuk mengatur relasi antar tabel
-require('./src/models');
+require('./src/models/index.js');
 
 (async () => {
     await db.sync();
@@ -24,7 +24,7 @@ require('./src/models');
 app.use('/', require('./src/routes/AuthRoutes.js'));
 app.use('/', require('./src/routes/importRoutes.js'));
 app.use('/helpdesk', require('./src/routes/HelpdeskAuthRoutes.js'));
-app.use('/user', verifyJWT, require('./src/routes/DormitizenRoutes.js'));
+app.use('/user', verifyJWT, require('./src/routes/UserRoutes.js'));
 app.use('/laporan', verifyJWT, require('./src/routes/LaporanRoutes.js'));
 app.use('/informasi', verifyJWT, require('./src/routes/InformasiRoutes.js'));
 app.use('/paket', verifyJWT, require('./src/routes/PaketRoutes.js'));

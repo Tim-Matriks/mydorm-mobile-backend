@@ -11,6 +11,11 @@ const Helpdesk = db.define('helpdesk', {
     },
     nip: { type: DataTypes.STRING(18), allowNull: false },
     nama: { type: DataTypes.STRING(100), allowNull: false },
+    gambar: {
+        type: DataTypes.STRING,
+        defaultValue: 'blank_profile_pic.png',
+        allowNull: false,
+    },
     user_id: {
         type: DataTypes.UUID,
         references: {
