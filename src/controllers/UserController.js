@@ -1,5 +1,4 @@
 const { Kamar, Helpdesk, Dormitizen, Gedung } = require('../models');
-const userRoleDetails = require('../utils/userRoleDetail');
 
 const getLoggedInUser = async (req, res) => {
     const { user_id, user_role } = req.loginData;
