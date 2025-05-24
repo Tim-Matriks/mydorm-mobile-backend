@@ -50,7 +50,7 @@ Kamar.belongsTo(Gedung, {
 // Dalam satu kamar, ada beberapa dormitizen
 Kamar.hasMany(Dormitizen, {
     foreignKey: 'kamar_id',
-    as: 'berada_di_kamar',
+    as: 'penghuni_kamar',
 });
 // Tiap dormitizen tinggal dalam sebuah kamar
 Dormitizen.belongsTo(Kamar, {

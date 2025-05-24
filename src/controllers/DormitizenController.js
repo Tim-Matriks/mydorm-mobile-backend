@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { User, Dormitizen, Helpdesk, Kamar, Gedung } = require('../models');
+const { Dormitizen, Helpdesk, Kamar, Gedung } = require('../models');
 
 const findDormitizenByKamar = async (req, res) => {
     const { user_id, user_role } = req.loginData;
@@ -24,14 +24,10 @@ const findDormitizenByKamar = async (req, res) => {
                 include: {
                     model: Kamar,
                     as: 'kamar',
-                    include: {
-                        model: Gedung,
-                        as: 'gedung',
-                        attributes: { include: ['gedung_id'] },
-                    },
+                    attributes: { include: ['gedung_id'] },
                 },
             });
-            gedung_id = me.kamar.gedung.gedung_id;
+            gedung_id = me.kamar.gedung_id;
         }
 
         const response = await Dormitizen.findAll({

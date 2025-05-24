@@ -1,26 +1,14 @@
-const { Op } = require('sequelize');
-const Kamar = require('../models/Kamar.js');
-const Dormitizen = require('../models/Dormitizen.js');
-const Gedung = require('../models/Gedung.js');
-const Helpdesk = require('../models/Helpdesk.js');
+const { Dormitizen, Helpdesk, Kamar, Gedung } = require('../models');
 
 const getUserKamarStatus = async (req, res) => {
-    const user_id = req.user_id;
-    const user_type = req.user_type;
+    const { user_id, user_role } = req.loginData;
 
     try {
-        if (user_type == 'helpdesk') {
-            return res.status(403).json({
-                message: 'Anda tidak boleh mengakses ini',
-                data: null,
-            });
-        }
-
         const response = await Kamar.findOne({
-            attributes: { exclude: ['created_at', 'updated_at'] },
             include: {
                 model: Dormitizen,
-                where: { dormitizen_id: user_id },
+                as: 'penghuni_kamar',
+                where: { user_id },
                 attributes: ['nama'],
             },
         });
@@ -34,44 +22,68 @@ const getUserKamarStatus = async (req, res) => {
 };
 
 const getAllKamarStatus = async (req, res) => {
-    const user_id = req.user_id;
-    const user_type = req.user_type;
+    const { user_id, user_role } = req.loginData;
 
     try {
-        if (user_type == 'dormitizen') {
-            return res.status(403).json({
-                message: 'Anda tidak boleh mengakses ini',
-                data: null,
+        let me;
+        let gedung_id;
+        if (user_role == 'helpdesk') {
+            me = await Helpdesk.findOne({
+                where: { user_id },
+                attributes: ['nama'],
+                include: {
+                    model: Gedung,
+                    as: 'gedung',
+                    attributes: { include: ['gedung_id'] },
+                },
             });
-        }
-
-        let gedung_id = null;
-
-        if (user_type == 'senior_resident') {
-            const user = await Dormitizen.findOne({
-                attributes: [],
-                include: { model: Kamar },
-                where: { dormitizen_id: user_id },
+            gedung_id = me.gedung.gedung_id;
+        } else {
+            me = await Dormitizen.findOne({
+                where: { user_id },
+                attributes: ['nama'],
+                include: {
+                    model: Kamar,
+                    as: 'kamar',
+                    attributes: { include: ['gedung_id'] },
+                },
             });
-            gedung_id = user.kamar.gedung_id;
-        } else if (user_type == 'helpdesk') {
-            const user = await Helpdesk.findOne({
-                attributes: [],
-                where: { helpdesk_id: user_id },
-            });
-            gedung_id = user.gedung_id;
+            gedung_id = me.kamar.gedung_id;
         }
 
         const response = await Kamar.findAll({
-            attributes: { exclude: ['created_at', 'updated_at'] },
-            include: { model: Gedung, where: { gedung_id }, attributes: [] },
+            attributes: ['nomor', 'status'],
+            include: {
+                attributes: ['nama'],
+                model: Dormitizen,
+                as: 'penghuni_kamar',
+            },
+            where: { gedung_id },
+            order: [['nomor', 'ASC']],
         });
-        res.json({
+
+        let countTerbuka = 0;
+        let countTertutup = 0;
+
+        response.forEach((kamar) => {
+            if (kamar.status === 'terbuka') {
+                countTerbuka++;
+            } else if (kamar.status === 'tertutup') {
+                countTertutup++;
+            }
+        });
+        return res.json({
             message: `Status kamar satu gedung berhasil diambil`,
+            countTerbuka,
+            countTertutup,
             data: response,
         });
     } catch (error) {
-        res.status(500).json({ message: error.message, data: null });
+        console.error(error);
+        return res.status(500).json({
+            message: 'Terjadi kesalahan saat mengambil status semua kamar',
+            errMsg: error.message,
+        });
     }
 };
 
