@@ -133,6 +133,47 @@ const createPelanggaran = async (req, res) => {
     }
 };
 
+const updatePelanggaran = async (req, res) => {
+    const pelanggaran_id = req.params.id;
+    const { kategori, waktu, dormitizen_id } = req.body;
+
+    try {
+        const oldPelanggaran = await Pelanggaran.findByPk(pelanggaran_id);
+
+        if (!oldPelanggaran) {
+            deleteFile('images/pelanggaran', req.file?.filename);
+
+            return res.status(404).json({
+                message: 'Data pelanggaran tidak ditemukan',
+            });
+        }
+
+        let imagePath = oldPelanggaran.gambar;
+        if (req.file) {
+            deleteFile('images/pelanggaran', oldPelanggaran.gambar);
+            imagePath = req.file.filename;
+        }
+
+        await oldPelanggaran.update({
+            kategori,
+            waktu,
+            pelanggar_id: dormitizen_id,
+            gambar: imagePath,
+        });
+
+        res.status(200).json({
+            message: 'Data pelanggaran berhasil diubah',
+            data: oldPelanggaran,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Terjadi kesalahan saat mengubah data pelanggaran',
+            errMsg: error.message,
+        });
+    }
+};
+
 const deletePelanggaran = async (req, res) => {
     const pelanggaran_id = req.params.id;
 
@@ -166,5 +207,6 @@ module.exports = {
     getAllPelanggaranByUserId,
     getAllPelanggaranByKamarId,
     createPelanggaran,
+    updatePelanggaran,
     deletePelanggaran,
 };
