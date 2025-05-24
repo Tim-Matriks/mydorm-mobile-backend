@@ -47,6 +47,16 @@ Kamar.belongsTo(Gedung, {
     as: 'gedung',
 });
 
+// Helpdesk berada di sebuah gedung
+Gedung.hasMany(Helpdesk, {
+    foreignKey: 'gedung_id',
+    as: 'helpdesk',
+});
+Helpdesk.belongsTo(Gedung, {
+    foreignKey: 'gedung_id',
+    as: 'gedung',
+});
+
 // Dalam satu kamar, ada beberapa dormitizen
 Kamar.hasMany(Dormitizen, {
     foreignKey: 'kamar_id',

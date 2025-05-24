@@ -11,11 +11,6 @@ const findDormitizenByKamar = async (req, res) => {
         if (user_role == 'helpdesk') {
             me = await Helpdesk.findOne({
                 where: { user_id },
-                include: {
-                    model: Gedung,
-                    as: 'gedung',
-                    attributes: { include: ['gedung_id'] },
-                },
             });
             gedung_id = me.gedung.gedung_id;
         } else {

@@ -30,14 +30,8 @@ const getAllKamarStatus = async (req, res) => {
         if (user_role == 'helpdesk') {
             me = await Helpdesk.findOne({
                 where: { user_id },
-                attributes: ['nama'],
-                include: {
-                    model: Gedung,
-                    as: 'gedung',
-                    attributes: { include: ['gedung_id'] },
-                },
             });
-            gedung_id = me.gedung.gedung_id;
+            gedung_id = me.gedung_id;
         } else {
             me = await Dormitizen.findOne({
                 where: { user_id },

@@ -8,7 +8,7 @@ const getLoggedInUser = async (req, res) => {
         if (user_role == 'helpdesk') {
             userDetail = await Helpdesk.findOne({
                 where: { user_id },
-                include: { model: Gedung },
+                include: { model: Gedung, as: 'gedung' },
             });
         } else {
             userDetail = await Dormitizen.findOne({
