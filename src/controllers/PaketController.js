@@ -1,4 +1,4 @@
-const { Paket, Dormitizen, Helpdesk, User } = require('../models');
+const { Paket, Dormitizen, Helpdesk, User, Kamar } = require('../models');
 const deleteFile = require('../utils/fileHelpers');
 const userRoleDetails = require('../utils/userRoleDetail');
 const dayjs = require('dayjs');
@@ -8,7 +8,15 @@ const getAllPaket = async (req, res) => {
         // TODO: Rapihin output agar tidak kebanyakan data
         const allPaket = await Paket.findAll({
             include: [
-                { model: Dormitizen, as: 'pemilik_paket' },
+                {
+                    model: Dormitizen,
+                    as: 'pemilik_paket',
+                    include: {
+                        model: Kamar,
+                        as: 'kamar',
+                        attributes: ['nomor'],
+                    },
+                },
                 { model: Helpdesk, as: 'penerima_paket' },
                 { model: Helpdesk, as: 'penyerah_paket' },
             ],
