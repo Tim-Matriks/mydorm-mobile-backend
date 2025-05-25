@@ -21,13 +21,7 @@ const User = db.define('user', {
         type: DataTypes.ENUM,
         values: ['dormitizen', 'senior_resident', 'helpdesk'],
     },
-    gambar: {
-        type: DataTypes.STRING,
-        defaultValue: 'blank_profile_pic.png',
-        allowNull: false,
-    },
-
-    refresh_token: DataTypes.STRING,
+    refresh_token: { type: DataTypes.STRING, allowNull: true },
 });
 
 module.exports = User;
