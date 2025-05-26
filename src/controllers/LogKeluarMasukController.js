@@ -2,7 +2,9 @@ const LogKeluarMasuk = require('../models/LogKeluarMasuk.js');
 const sequelize = require('../configs/database.js');
 const SeniorResident = require('../models/SeniorResident.js');
 const Dormitizen = require('../models/Dormitizen');
+const Helpdesk = require('../models/Helpdesk.js');
 const Kamar = require('../models/Kamar');
+const { sendNotification } = require('./NotificationController.js');
 const { Op } = require("sequelize");
 
 
@@ -80,33 +82,53 @@ const ubahStatus = async (req, res) => {
             where: {log_keluar_masuk_id: log_id},
         });
 
-        const penghuniKamar = await Dormitizen.findOne({
+        const dormitizen = await Dormitizen.findOne({
             where: {dormitizen_id: logData.dormitizen_id}
         })
 
-        if (logData.aktivitas == 'masuk' && status == 'diterima') {
-            await Kamar.update(
-                {
-                    status: 'terbuka'
-                },
-                {
-                    where: {kamar_id: penghuniKamar.kamar_id}
+        const penghuniKamar = await Dormitizen.findAll({
+            where: {kamar_id: dormitizen.kamar_id}
+        })
+
+        if (status == 'diterima') {
+            // Mengirim notifikasi kepada seluruh penghuni kamar yang memiliki fcm_token
+            for (const penghuni of penghuniKamar) {
+                if (penghuni.fcm_token) {
+                    const notifTitle = `Kamar ${logData.aktivitas === 'masuk' ? 'Terbuka' : 'Terkunci'}`;
+                    const notifBody = `Request ${logData.aktivitas} dari penghuni telah diterima.`;
+
+                    await sendNotification({
+                        fcm_token: penghuni.fcm_token,
+                        title: notifTitle,
+                        body: notifBody,
+                    });
+
+                    await Notifikasi.create({
+                        title: notifTitle,
+                        body: notifBody,
+                        dormitizen_id: penghuni.dormitizen_id,
+                    });
                 }
-            )
-        } else if (logData.aktivitas == 'keluar' && status == 'diterima') {
-            await Kamar.update(
-                {
-                    status: 'terkunci'
-                },
-                {
-                    where: {kamar_id: penghuniKamar.kamar_id}
-                }
-            )
+            }
+
+            if (logData.aktivitas === 'masuk') {
+                await Kamar.update(
+                    { status: 'terbuka' },
+                    { where: { kamar_id: dormitizen.kamar_id } }
+                );
+            } else if (logData.aktivitas === 'keluar') {
+                await Kamar.update(
+                    { status: 'terkunci' },
+                    { where: { kamar_id: dormitizen.kamar_id } }
+                );
+            }
         }
 
         const log = await LogKeluarMasuk.update(value, {
             where: { log_keluar_masuk_id: log_id },
         });
+
+
 
         return res.status(200).json({
             message: `Update berhasil. Request keluar-masuk ${status}`,
@@ -158,6 +180,20 @@ const handleRequestKeluarMasuk = async (req, res) => {
 
         const kamarStatus = kamar.status; // 'terkunci' atau 'terbuka'
 
+        //Kirim notifikasi ke helpdesk
+        const helpdesk = await Helpdesk.findAll()
+        for (const hd of helpdesk) {
+            if (hd.fcm_token) {
+                const notifTitle = 'Log Keluar Masuk';
+                const notifBody = 'Terdapat Request Keluar-Masuk';
+
+                await sendNotification({
+                    fcm_token: hd.fcm_token,
+                    title: notifTitle,
+                    body: notifBody,
+                });
+            }
+        }
         // Step 4: Lanjutkan logika request keluar/masuk
         if (kamarStatus === 'terkunci') {
             // Request masuk

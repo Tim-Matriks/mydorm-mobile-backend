@@ -3,6 +3,8 @@ const Dormitizen = require('../models/Dormitizen.js');
 const Helpdesk = require('../models/Helpdesk.js');
 const Kamar = require('../models/Kamar.js');
 const Paket = require('../models/Paket.js');
+const Notifikasi = require('../models/Notifikasi.js');
+const { sendNotification } = require('./NotificationController.js');
 
 const getAllPaket = async (req, res) => {
     try {
@@ -163,11 +165,31 @@ const createPaket = async (req, res) => {
 
             await paket.save();
 
-            const response = paket;
+            const dormTarget = await Dormitizen.findByPk(paket.dormitizen_id, {
+                attributes: ['fcm_token', 'nama'], 
+            });
+
+            if (dormTarget?.fcm_token) {
+                try {
+                    await sendNotification({
+                        fcm_token: dormTarget.fcm_token,
+                        title: 'Paket Baru Telah Diterima',
+                        body: `Halo ${dormTarget.nama}, ada paket baru untukmu!`,
+                    });
+
+                    await Notifikasi.create({
+                        title: 'Paket Baru Telah Diterima',
+                        body: `Halo ${dormTarget.nama}, ada paket baru untukmu!`,
+                        dormitizen_id: paket.dormitizen_id,
+                    });
+                } catch (notifErr) {
+                    console.error('Gagal kirim notifikasi:', notifErr.message);
+                }
+            }
 
             res.json({
                 message: `Data paket berhasil ditambahkan`,
-                data: response,
+                data: paket,
             });
         });
     } catch (error) {

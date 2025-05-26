@@ -14,6 +14,7 @@ const Helpdesk = db.define('helpdesk', {
     username: DataTypes.STRING(100),
     password: DataTypes.STRING(100),
     refresh_token: DataTypes.STRING,
+    fcm_token: DataTypes.STRING(512),
     gedung_id: {
         type: DataTypes.BIGINT,
         references: {

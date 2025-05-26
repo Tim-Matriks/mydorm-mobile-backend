@@ -8,6 +8,7 @@ const Laporan = require('./Laporan');
 const LogKeluarMasuk = require('./LogKeluarMasuk');
 const Paket = require('./Paket');
 const Pelanggaran = require('./Pelanggaran');
+const Notifikasi = require('./Notifikasi');
 
 // Relasi tiap gedung punya beberapa helpdesk
 Helpdesk.belongsTo(Gedung, {
@@ -103,4 +104,12 @@ Berita.belongsTo(SeniorResident, {
 });
 SeniorResident.hasMany(Berita, {
     foreignKey: 'senior_resident_id',
+});
+
+// Relasi tiap dormitizen dapat memiliki lebih dari satu notifikasi
+Dormitizen.hasMany(Notifikasi, {
+    foreignKey: 'dormitizen_id'
+});
+Notifikasi.belongsTo(Dormitizen, {
+    foreignKey: 'dormitizen_id'
 });

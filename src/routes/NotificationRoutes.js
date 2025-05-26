@@ -3,7 +3,10 @@ const router = express.Router();
 
 const NotificationController = require('../controllers/NotificationController');
 
-router.post('/saveToken', NotificationController.saveToken);
-router.delete('/deleteToken', NotificationController.deleteToken);
+router.post('/saveTokenDormitizen', NotificationController.saveTokenDormitizen);
+router.delete('/deleteTokenDormitizen', NotificationController.deleteTokenDormitizen);
+router.post('/saveTokenHelpdesk', NotificationController.saveTokenHelpdesk);
+router.delete('/deleteTokenHelpdesk', NotificationController.deleteTokenHelpdesk);
+
 
 module.exports = router;
