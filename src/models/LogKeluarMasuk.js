@@ -9,7 +9,11 @@ const LogKeluarMasuk = db.define('log_keluar_masuk', {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
     },
-    waktu: { type: DataTypes.DATE, allowNull: false },
+    waktu: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+    },
     aktivitas: {
         type: DataTypes.ENUM,
         values: ['keluar', 'masuk'],
