@@ -178,8 +178,8 @@ const createPaket = async (req, res) => {
                     });
 
                     await Notifikasi.create({
-                        title: 'Paket Baru Telah Diterima',
-                        body: `Halo ${dormTarget.nama}, ada paket baru untukmu!`,
+                        judul: 'Paket Baru Telah Diterima',
+                        isi: `Halo ${dormTarget.nama}, ada paket baru untukmu!`,
                         dormitizen_id: paket.dormitizen_id,
                     });
                 } catch (notifErr) {

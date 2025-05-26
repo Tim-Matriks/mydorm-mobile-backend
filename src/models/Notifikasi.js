@@ -10,13 +10,11 @@ const Notifikasi = db.define('notification', {
         primaryKey: true,
         autoIncrement: true,
     },
-    title: {
+    judul: {
         type: DataTypes.STRING(100),
-        allowNull: false,
     },
-    body: {
+    isi: {
         type: DataTypes.TEXT,
-        allowNull: false,
     },
     dormitizen_id: {
         type: DataTypes.BIGINT,

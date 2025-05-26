@@ -4,6 +4,7 @@ const SeniorResident = require('../models/SeniorResident.js');
 const Dormitizen = require('../models/Dormitizen');
 const Helpdesk = require('../models/Helpdesk.js');
 const Kamar = require('../models/Kamar');
+const Notifikasi = require('../models/Notifikasi.js')
 const { sendNotification } = require('./NotificationController.js');
 const { Op } = require("sequelize");
 
@@ -104,8 +105,8 @@ const ubahStatus = async (req, res) => {
                     });
 
                     await Notifikasi.create({
-                        title: notifTitle,
-                        body: notifBody,
+                        judul: notifTitle,
+                        isi: notifBody,
                         dormitizen_id: penghuni.dormitizen_id,
                     });
                 }
