@@ -3,7 +3,8 @@ const router = express.Router();
 
 const LogKeluarMasukController = require('../controllers/LogKeluarMasukController');
 
-router.get('/', LogKeluarMasukController.getAllLogKeluarMasukByUser);
+router.get('/', LogKeluarMasukController.getAllLogKeluarMasuk);
+router.get('/me', LogKeluarMasukController.getAllLogKeluarMasukOfDormitizen);
 router.get('/status', LogKeluarMasukController.cekStatus);
 router.put('/status/:aksi/:id', LogKeluarMasukController.ubahStatus);
 router.post('/keluar', LogKeluarMasukController.requestKeluar);
