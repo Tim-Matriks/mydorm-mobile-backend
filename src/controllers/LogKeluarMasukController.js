@@ -94,20 +94,20 @@ const ubahStatus = async (req, res) => {
         if (status == 'diterima') {
             // Mengirim notifikasi kepada seluruh penghuni kamar yang memiliki fcm_token
             for (const penghuni of penghuniKamar) {
-                if (penghuni.fcm_token) {
-                    const notifTitle = `Kamar ${logData.aktivitas === 'masuk' ? 'Terbuka' : 'Terkunci'}`;
-                    const notifBody = `Request ${logData.aktivitas} dari penghuni telah diterima.`;
+                const notifTitle = `Kamar ${logData.aktivitas === 'masuk' ? 'Terbuka' : 'Terkunci'}`;
+                const notifBody = `Request ${logData.aktivitas} dari penghuni telah diterima.`;
 
+                await Notifikasi.create({
+                    judul: notifTitle,
+                    isi: notifBody,
+                    dormitizen_id: penghuni.dormitizen_id,
+                });
+                
+                if (penghuni.fcm_token) {
                     await sendNotification({
                         fcm_token: penghuni.fcm_token,
                         title: notifTitle,
                         body: notifBody,
-                    });
-
-                    await Notifikasi.create({
-                        judul: notifTitle,
-                        isi: notifBody,
-                        dormitizen_id: penghuni.dormitizen_id,
                     });
                 }
             }

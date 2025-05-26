@@ -169,18 +169,18 @@ const createPaket = async (req, res) => {
                 attributes: ['fcm_token', 'nama'], 
             });
 
+            await Notifikasi.create({
+                judul: 'Paket Baru Telah Diterima',
+                isi: `Halo ${dormTarget.nama}, ada paket baru untukmu!`,
+                dormitizen_id: paket.dormitizen_id,
+            });
+
             if (dormTarget?.fcm_token) {
                 try {
                     await sendNotification({
                         fcm_token: dormTarget.fcm_token,
                         title: 'Paket Baru Telah Diterima',
                         body: `Halo ${dormTarget.nama}, ada paket baru untukmu!`,
-                    });
-
-                    await Notifikasi.create({
-                        judul: 'Paket Baru Telah Diterima',
-                        isi: `Halo ${dormTarget.nama}, ada paket baru untukmu!`,
-                        dormitizen_id: paket.dormitizen_id,
                     });
                 } catch (notifErr) {
                     console.error('Gagal kirim notifikasi:', notifErr.message);
