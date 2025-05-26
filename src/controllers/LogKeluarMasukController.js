@@ -2,20 +2,105 @@ const LogKeluarMasuk = require('../models/LogKeluarMasuk.js');
 const sequelize = require('../configs/database.js');
 const Dormitizen = require('../models/Dormitizen.js');
 const Kamar = require('../models/Kamar');
+const userRoleDetails = require('../utils/userRoleDetail.js');
+const Helpdesk = require('../models/Helpdesk.js');
+const User = require('../models/User.js');
 
 const getAllLogKeluarMasukByUser = async (req, res) => {
-    const user_id = req.user_id;
-
+    const { user_id, user_role } = req.loginData;
     try {
-        const response = await LogKeluarMasuk.findAll({
-            where: { dormitizen_id: user_id },
+        let userDetail, gedung_id;
+        if (user_role == 'helpdesk') {
+            userDetail = await Helpdesk.findOne({
+                where: { user_id },
+            });
+            gedung_id = userDetail.gedung_id;
+        } else {
+            userDetail = await Dormitizen.findOne({
+                where: { user_id },
+                include: {
+                    model: Kamar,
+                    as: 'kamar',
+                },
+            });
+            gedung_id = userDetail.kamar.gedung_id;
+        }
+
+        let response;
+        if (user_role == 'dormitizen') {
+            response = await LogKeluarMasuk.findAll({
+                where: { dormitizen_id: userDetail.dormitizen_id },
+                include: [
+                    {
+                        model: Dormitizen,
+                        as: 'dormitizen',
+                        include: {
+                            model: Kamar,
+                            as: 'kamar',
+                        },
+                    },
+                    {
+                        model: User,
+                        as: 'pencatat',
+                        attributes: ['role'],
+                        include: [{ model: Helpdesk }, { model: Dormitizen }],
+                    },
+                ],
+            });
+        } else {
+            response = await LogKeluarMasuk.findAll({
+                where: { '$dormitizen.kamar.gedung_id$': gedung_id },
+                include: [
+                    {
+                        model: Dormitizen,
+                        as: 'dormitizen',
+                        include: {
+                            model: Kamar,
+                            as: 'kamar',
+                        },
+                    },
+                    {
+                        model: User,
+                        as: 'pencatat',
+                        attributes: ['role'],
+                        include: [{ model: Helpdesk }, { model: Dormitizen }],
+                    },
+                ],
+            });
+        }
+
+        const cleanedLogs = response.map((log) => {
+            const pencatat = log.pencatat;
+
+            let pencatatData = null;
+            if (pencatat.helpdesk) {
+                pencatatData = {
+                    role: 'helpdesk',
+                    ...pencatat.helpdesk.toJSON(),
+                };
+            } else if (pencatat.dormitizen) {
+                pencatatData = {
+                    role: 'senior_resident',
+                    ...pencatat.dormitizen.toJSON(),
+                };
+            }
+
+            return {
+                ...log.toJSON(),
+                pencatat: pencatatData,
+            };
         });
-        res.json({
-            message: `Data log keluar masuk berhasil diambil`,
-            data: response,
+
+        return res.json({
+            message: 'Berhasil mengambil daftar log keluar masuk',
+            data: cleanedLogs,
         });
     } catch (error) {
-        res.status(500).json({ message: error.message, data: null });
+        console.error(error);
+        return res.status(500).json({
+            message: 'Terjadi kesalahan saat mengambil daftar log keluar masuk',
+            errMsg: error.message,
+        });
     }
 };
 

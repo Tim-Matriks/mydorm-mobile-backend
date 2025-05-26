@@ -9,6 +9,7 @@ const Helpdesk = require('./Helpdesk');
 const Informasi = require('./Informasi');
 const Paket = require('./Paket');
 const Pelanggaran = require('./Pelanggaran');
+const LogKeluarMasuk = require('./LogKeluarMasuk');
 
 module.exports = {
     Sequelize,
@@ -101,4 +102,22 @@ Pelanggaran.belongsTo(Dormitizen, {
 Pelanggaran.belongsTo(Dormitizen, {
     foreignKey: 'pelanggar_id',
     as: 'pelanggar',
+});
+
+// Dormitizen dicatat log keluar masuk nya
+LogKeluarMasuk.belongsTo(Dormitizen, {
+    foreignKey: 'dormitizen_id',
+    as: 'dormitizen',
+});
+LogKeluarMasuk.belongsTo(User, {
+    foreignKey: 'pencatat_id',
+    as: 'pencatat',
+});
+Dormitizen.hasMany(LogKeluarMasuk, {
+    foreignKey: 'dormitizen_id',
+    as: 'log_keluar_masuk',
+});
+User.hasMany(LogKeluarMasuk, {
+    foreignKey: 'pencatat_id',
+    as: 'log_keluar_masuk',
 });
