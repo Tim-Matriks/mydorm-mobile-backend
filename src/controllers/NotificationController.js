@@ -1,6 +1,7 @@
 const Dormitizen = require('../models/Dormitizen.js');
-const Helpdesk = require('../models/Helpdesk.js')
-const admin = require('../../firebase.js')
+const Helpdesk = require('../models/Helpdesk.js');
+const admin = require('../../firebase.js');
+const Notifikasi = require('../models/Notifikasi.js');
 
 const saveTokenDormitizen = async (req, res) => {
     const { fcm_token } = req.body;
@@ -135,10 +136,34 @@ const saveTokenDormitizen = async (req, res) => {
   return await admin.messaging().send(message);
 };
 
+const getAllNotificationByUser = async (req, res) => {
+  const dormitizen_id = req.user_id;
+  const user_type = req.user_type;
+
+  try {
+    if (user_type == 'helpdesk') {
+      return res.status(403).json({
+        message: 'Anda haru login sebagai dormitizen atau senior resident',
+        data: null
+      });
+    }
+    const response = await Notifikasi.findAll({
+      where: {dormitizen_id: dormitizen_id}
+    });
+    res.json({
+      message: 'Data notifikasi berhasil diambil',
+      data: response
+    })
+  } catch (error) {
+    res.status(500).json({message: error.message, data: null})
+  }
+}
+
 module.exports = {
     saveTokenDormitizen,
     deleteTokenDormitizen,
     sendNotification,
     saveTokenHelpdesk,
-    deleteTokenHelpdesk
+    deleteTokenHelpdesk,
+    getAllNotificationByUser
 };
