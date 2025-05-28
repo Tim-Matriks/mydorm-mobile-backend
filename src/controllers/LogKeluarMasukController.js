@@ -5,6 +5,7 @@ const Kamar = require('../models/Kamar');
 const userRoleDetails = require('../utils/userRoleDetail.js');
 const Helpdesk = require('../models/Helpdesk.js');
 const User = require('../models/User.js');
+const { Op } = require('sequelize');
 
 const getAllLogKeluarMasuk = async (req, res) => {
     const { user_id, user_role } = req.loginData;
@@ -149,33 +150,58 @@ const getAllLogKeluarMasukOfDormitizen = async (req, res) => {
     }
 };
 
-// const cekStatus = async (req, res) => {
-//     const { user_id, user_role } = req.loginData;
-//     if (user_role == 'helpdesk')
-//         return res
-//             .status(403)
-//             .json({ message: 'Anda tidak boleh mengakses halaman ini' });
+const cekStatus = async (req, res) => {
+    const { user_id, user_role } = req.loginData;
+    if (user_role == 'helpdesk')
+        return res
+            .status(403)
+            .json({ message: 'Anda tidak boleh mengakses halaman ini' });
 
-//     try {
-//         const requestTerbaru = await LogKeluarMasuk.findOne({
-//             where: { dormitizen_id: user_id },
-//             order: [['created_at', 'DESC']],
-//         });
-//         let status;
-//         if (requestTerbaru.status == 'pending') {
-//             status = 'pending';
-//         } else {
-//             if (requestTerbaru.aktivitas == 'keluar') {
-//                 status = 'diluar gedung';
-//             } else if (requestTerbaru.aktivitas == 'masuk') {
-//                 status = 'dalam gedung';
-//             }
-//         }
-//         res.json({ message: 'Status dormitizen berhasil diambil', status });
-//     } catch (error) {
-//         res.status(500).json({ message: error.message, data: null });
-//     }
-// };
+    try {
+        const userDetail = await userRoleDetails(user_id, user_role);
+        const kamarId = userDetail.kamar_id;
+
+        const penghuniKamar = await Dormitizen.findAll({
+            where: { kamar_id: kamarId },
+        });
+        const kamarnya = await Kamar.findOne({
+            where: { kamar_id: kamarId },
+        });
+
+        const penghuniKamarId = penghuniKamar.map(
+            (dormitizen) => dormitizen.dormitizen_id
+        );
+
+        const requestTerbaru = await LogKeluarMasuk.findAll({
+            where: { dormitizen_id: { [Op.or]: penghuniKamarId } },
+            order: [['created_at', 'DESC']],
+        });
+        const hasPending = requestTerbaru.some(
+            (item) => item.status === 'pending'
+        );
+
+        let status;
+        if (hasPending) {
+            status = 'pending';
+        } else {
+            if (kamarnya.status == 'terkunci') {
+                status = 'Kamar terkunci';
+            } else if (kamarnya.aktivitas == 'terbuka') {
+                status = 'Kamar terbuka';
+            }
+        }
+        res.json({
+            message: 'Status kamar dormitizen berhasil diambil',
+            status,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Terjadi kesalahan saat mengambil status kamar dormitizen',
+            errMsg: error.message,
+        });
+    }
+};
 
 // const ubahStatus = async (req, res) => {
 //     const user_id = req.user_id;
@@ -291,7 +317,7 @@ const handleRequestKeluarMasuk = async (req, res) => {
 module.exports = {
     getAllLogKeluarMasuk,
     getAllLogKeluarMasukOfDormitizen,
-    // cekStatus,
+    cekStatus,
     // ubahStatus,
     handleRequestKeluarMasuk,
 };
