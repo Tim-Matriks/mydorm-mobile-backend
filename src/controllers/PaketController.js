@@ -10,15 +10,24 @@ const deleteFile = require('../utils/fileHelpers');
 const userRoleDetails = require('../utils/userRoleDetail');
 const dayjs = require('dayjs');
 const { sendNotification } = require('./NotifikasiController');
+const { Op } = require('sequelize');
 
 const getAllPaket = async (req, res) => {
+    const { search } = req.query;
+
     try {
+        const where = {};
+        if (search) {
+            where.nama = { [Op.like]: `%${search}%` };
+        }
+
         // TODO: Rapihin output agar tidak kebanyakan data
         const allPaket = await Paket.findAll({
             include: [
                 {
                     model: Dormitizen,
                     as: 'pemilik_paket',
+                    where,
                     include: {
                         model: Kamar,
                         as: 'kamar',
