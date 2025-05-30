@@ -9,10 +9,10 @@ const getAllInformasi = async (req, res) => {
             include: {
                 model: User,
                 as: 'penulis',
-                attributes: ['user_id', 'gambar'],
+                attributes: ['user_id'],
                 include: [
-                    { model: Dormitizen, attributes: ['nama'] },
-                    { model: Helpdesk, attributes: ['nama'] },
+                    { model: Dormitizen, attributes: ['nama', 'gambar'] },
+                    { model: Helpdesk, attributes: ['nama', 'gambar'] },
                 ],
             },
         });
