@@ -28,6 +28,7 @@ const getAllPaket = async (req, res) => {
                 { model: Helpdesk, as: 'penerima_paket' },
                 { model: Helpdesk, as: 'penyerah_paket' },
             ],
+            order: [['created_at', 'DESC']],
         });
 
         return res.json({
@@ -57,6 +58,7 @@ const getAllPaketByUser = async (req, res) => {
                 { model: Helpdesk, as: 'penyerah_paket' },
             ],
             where: { pemilik_paket_id },
+            order: [['created_at', 'DESC']],
         });
 
         res.json({

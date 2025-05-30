@@ -35,6 +35,7 @@ const getPelanggaranById = async (req, res) => {
                 { model: Dormitizen, as: 'pelanggar' },
             ],
             where: { pelanggaran_id },
+            order: [['created_at', 'DESC']],
         });
         res.json({
             message: `Data sebuah pelanggaran berhasil diambil`,
@@ -59,6 +60,7 @@ const getAllPelanggaranByUserId = async (req, res) => {
                 { model: Dormitizen, as: 'pelanggar' },
             ],
             where: { pelanggar_id: dormitizen_id },
+            order: [['created_at', 'DESC']],
         });
         res.json({
             message: `Data pelanggaran seorang dormitizen berhasil diambil`,
@@ -83,6 +85,7 @@ const getAllPelanggaranByKamarId = async (req, res) => {
                 { model: Dormitizen, as: 'pelapor' },
                 { model: Dormitizen, as: 'pelanggar', where: { kamar_id } },
             ],
+            order: [['created_at', 'DESC']],
         });
         res.json({
             message: `Data pelanggaran dormitizen sekamar berhasil diambil`,
