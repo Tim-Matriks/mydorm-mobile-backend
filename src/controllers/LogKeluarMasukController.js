@@ -219,6 +219,11 @@ const ubahStatus = async (req, res) => {
         const log = await LogKeluarMasuk.findOne({
             where: { log_keluar_masuk_id: log_id },
         });
+        if (!log) {
+            return res
+                .status(404)
+                .json({ message: 'Log dengan id tersebut tidak ada' });
+        }
         if (log.pencatat_id != null) {
             return res.status(400).json({ message: 'Log sudah diproses' });
         }
