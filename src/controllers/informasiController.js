@@ -1,9 +1,21 @@
 const { User, Dormitizen, Helpdesk } = require('../models');
 const Informasi = require('../models/Informasi');
 const deleteFile = require('../utils/fileHelpers');
+const { Op } = require('sequelize');
 
 const getAllInformasi = async (req, res) => {
+    const { search, kategori } = req.query;
     try {
+        const where = {};
+
+        if (search) {
+            where.judul = { [Op.like]: `%${search}%` };
+        }
+
+        if (kategori) {
+            where.kategori = kategori;
+        }
+
         const allInfo = await Informasi.findAll({
             order: [['created_at', 'DESC']],
             include: {
@@ -15,6 +27,7 @@ const getAllInformasi = async (req, res) => {
                     { model: Helpdesk, attributes: ['nama', 'gambar'] },
                 ],
             },
+            where,
         });
 
         const hasil = allInfo.map((info) => {
@@ -26,13 +39,14 @@ const getAllInformasi = async (req, res) => {
                 gambar: info.gambar,
                 created_at: info.created_at,
                 updated_at: info.updated_at,
-                foto_profil_penulis: info.penulis.gambar,
             };
 
             if (info.penulis.dormitizen != null) {
                 infoBaru.nama_penulis = info.penulis.dormitizen.nama;
+                infoBaru.foto_profil_penulis = info.penulis.dormitizen.gambar;
             } else {
                 infoBaru.nama_penulis = info.penulis.helpdesk.nama;
+                infoBaru.foto_profil_penulis = info.penulis.helpdesk.gambar;
             }
             return infoBaru;
         });
