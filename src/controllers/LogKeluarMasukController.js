@@ -1,11 +1,14 @@
-const LogKeluarMasuk = require('../models/LogKeluarMasuk.js');
-const sequelize = require('../configs/database.js');
-const Dormitizen = require('../models/Dormitizen.js');
-const Kamar = require('../models/Kamar');
+const {
+    LogKeluarMasuk,
+    Dormitizen,
+    Kamar,
+    Helpdesk,
+    User,
+    Notifikasi,
+} = require('../models');
 const userRoleDetails = require('../utils/userRoleDetail.js');
-const Helpdesk = require('../models/Helpdesk.js');
-const User = require('../models/User.js');
 const { Op } = require('sequelize');
+const { sendNotification } = require('./NotifikasiController');
 
 const getAllLogKeluarMasuk = async (req, res) => {
     const { user_id, user_role } = req.loginData;
@@ -49,6 +52,7 @@ const getAllLogKeluarMasuk = async (req, res) => {
                     include: [{ model: Helpdesk }, { model: Dormitizen }],
                 },
             ],
+            order: [['created_at', 'DESC']],
         });
 
         const cleanedLogs = response.map((log) => {
@@ -113,6 +117,7 @@ const getAllLogKeluarMasukOfDormitizen = async (req, res) => {
                     include: [{ model: Helpdesk }, { model: Dormitizen }],
                 },
             ],
+            order: [['created_at', 'DESC']],
         });
 
         const cleanedLogs = response.map((log) => {
@@ -235,14 +240,38 @@ const ubahStatus = async (req, res) => {
         const kamar = await Kamar.findOne({
             where: { kamar_id: dormitizen.kamar_id },
         });
+        penghuniKamar = await Dormitizen.findAll({
+            where: { kamar_id: dormitizen.kamar_id },
+            include: { model: User, attributes: ['fcm_token'] },
+        });
 
         if (status == 'diterima') {
             const newStatus =
                 kamar.status === 'terbuka' ? 'terkunci' : 'terbuka';
             await kamar.update({ status: newStatus });
-        }
 
-        res.status(200).json({
+            // Mengirim notifikasi kepada seluruh penghuni kamar yang memiliki fcm_token
+            for (const penghuni of penghuniKamar) {
+                const notifTitle = `Kamar ${
+                    log.aktivitas === 'masuk' ? 'Terbuka' : 'Terkunci'
+                }`;
+                const notifBody = `Request ${log.aktivitas} dari penghuni telah diterima.`;
+
+                await Notifikasi.create({
+                    judul: notifTitle,
+                    isi: notifBody,
+                    user_id: penghuni.user_id,
+                });
+                if (penghuni.fcm_token) {
+                    await sendNotification({
+                        fcm_token: penghuni.user.fcm_token,
+                        title: notifTitle,
+                        body: notifBody,
+                    });
+                }
+            }
+        }
+        return res.status(200).json({
             message: `Update berhasil. Request keluar-masuk ${status}`,
         });
     } catch (error) {

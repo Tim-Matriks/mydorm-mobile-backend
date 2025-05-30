@@ -23,6 +23,7 @@ module.exports = {
     Paket,
     Pelanggaran,
     Notifikasi,
+    LogKeluarMasuk,
 };
 
 // Tiap user merupakan seorang dormitizen atau helpdesk

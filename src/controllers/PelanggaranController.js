@@ -9,6 +9,7 @@ const getAllPelanggaran = async (req, res) => {
                 { model: Dormitizen, as: 'pelapor' },
                 { model: Dormitizen, as: 'pelanggar' },
             ],
+            order: [['created_at', 'DESC']],
         });
         res.json({
             message: `Data semua pelanggaran berhasil diambil`,
