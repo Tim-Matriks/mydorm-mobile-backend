@@ -21,6 +21,10 @@ const User = db.define('user', {
         type: DataTypes.ENUM,
         values: ['dormitizen', 'senior_resident', 'helpdesk'],
     },
+    fcm_token: {
+        type: DataTypes.STRING(512),
+        allowNull: true,
+    },
     refresh_token: { type: DataTypes.STRING, allowNull: true },
 });
 

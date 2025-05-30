@@ -10,6 +10,7 @@ const Informasi = require('./Informasi');
 const Paket = require('./Paket');
 const Pelanggaran = require('./Pelanggaran');
 const LogKeluarMasuk = require('./LogKeluarMasuk');
+const Notifikasi = require('./Notifikasi');
 
 module.exports = {
     Sequelize,
@@ -21,6 +22,7 @@ module.exports = {
     Helpdesk,
     Paket,
     Pelanggaran,
+    Notifikasi,
 };
 
 // Tiap user merupakan seorang dormitizen atau helpdesk
@@ -120,4 +122,12 @@ Dormitizen.hasMany(LogKeluarMasuk, {
 User.hasMany(LogKeluarMasuk, {
     foreignKey: 'pencatat_id',
     as: 'log_keluar_masuk',
+});
+
+// Relasi tiap dormitizen dapat memiliki lebih dari satu notifikasi
+User.hasMany(Notifikasi, {
+    foreignKey: 'user_id',
+});
+Notifikasi.belongsTo(User, {
+    foreignKey: 'user_id',
 });

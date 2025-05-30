@@ -1,7 +1,15 @@
-const { Paket, Dormitizen, Helpdesk, User, Kamar } = require('../models');
+const {
+    Paket,
+    Dormitizen,
+    Helpdesk,
+    User,
+    Kamar,
+    Notifikasi,
+} = require('../models');
 const deleteFile = require('../utils/fileHelpers');
 const userRoleDetails = require('../utils/userRoleDetail');
 const dayjs = require('dayjs');
+const { sendNotification } = require('./NotifikasiController');
 
 const getAllPaket = async (req, res) => {
     try {
@@ -91,6 +99,31 @@ const createPaket = async (req, res) => {
             gambar: req.file.filename,
             penerima_paket_id,
         });
+
+        const dormTarget = await Dormitizen.findByPk(dormitizen_id, {
+            attributes: ['nama'],
+            include: { model: User, attributes: ['fcm_token', 'user_id'] },
+        });
+        // return res.json(dormTarget);
+
+        await Notifikasi.create({
+            judul: 'Paket Baru Telah Diterima',
+            isi: `Halo ${dormTarget.nama}, ada paket baru untukmu!`,
+            user_id: dormTarget.user.user_id,
+        });
+
+        if (dormTarget?.user.fcm_token) {
+            try {
+                await sendNotification({
+                    fcm_token: dormTarget.user.fcm_token,
+                    title: 'Paket Baru Telah Diterima',
+                    body: `Halo ${dormTarget.nama}, ada paket baru untukmu!`,
+                });
+            } catch (notifErr) {
+                console.error('Gagal kirim notifikasi:', notifErr.message);
+            }
+        }
+
         res.status(201).json({
             message: 'Data paket berhasil dibuat',
             data: newPaket,

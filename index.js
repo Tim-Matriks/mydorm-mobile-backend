@@ -31,6 +31,12 @@ app.use('/informasi', verifyJWT, require('./src/routes/InformasiRoutes.js'));
 app.use('/paket', verifyJWT, require('./src/routes/PaketRoutes.js'));
 app.use('/kamar', verifyJWT, require('./src/routes/KamarRoutes.js'));
 app.use(
+    '/notification',
+    verifyJWT,
+    require('./src/routes/NotifikasiRoutes.js')
+);
+
+app.use(
     '/pelanggaran',
     verifyJWT,
     require('./src/routes/PelanggaranRoutes.js')
