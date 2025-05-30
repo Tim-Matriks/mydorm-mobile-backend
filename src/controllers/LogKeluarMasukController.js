@@ -203,42 +203,51 @@ const cekStatus = async (req, res) => {
     }
 };
 
-// const ubahStatus = async (req, res) => {
-//     const user_id = req.user_id;
-//     const log_id = req.params.id;
-//     const status = req.params.aksi;
-//     const user_type = req.user_type;
+const ubahStatus = async (req, res) => {
+    const { user_id, user_role } = req.loginData;
+    const log_id = req.params.id;
+    const status = req.params.aksi;
 
-//     try {
-//         if (user_type == 'dormitizen') {
-//             return res.status(403).json({
-//                 message: 'Anda tidak boleh mengakses ini',
-//                 data: null,
-//             });
-//         }
+    if (user_role == 'dormitizen')
+        return res
+            .status(403)
+            .json({ message: 'Anda tidak boleh mengakses halaman ini' });
 
-//         if (user_type == 'senior_resident') {
-//             const { senior_resident_id } = await SeniorResident.findOne({
-//                 where: { dormitizen_id: user_id },
-//             });
-//             value = { status, senior_resident_id };
-//         } else if (user_type == 'helpdesk') {
-//             value = { status, helpdesk_id: user_id };
-//         }
+    try {
+        const userDetail = await userRoleDetails(user_id, user_role);
 
-//         const log = await LogKeluarMasuk.update(value, {
-//             where: { log_keluar_masuk_id: log_id },
-//         });
+        const log = await LogKeluarMasuk.findOne({
+            where: { log_keluar_masuk_id: log_id },
+        });
+        if (log.pencatat_id != null) {
+            return res.status(400).json({ message: 'Log sudah diproses' });
+        }
+        await log.update({ status, pencatat_id: userDetail.user_id });
 
-//         res.status(200).json({
-//             message: `Update berhasil. Request keluar-masuk ${status}`,
-//             data: log,
-//         });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ message: error.message, data: null });
-//     }
-// };
+        const dormitizen = await Dormitizen.findOne({
+            where: { dormitizen_id: log.dormitizen_id },
+        });
+        const kamar = await Kamar.findOne({
+            where: { kamar_id: dormitizen.kamar_id },
+        });
+
+        if (status == 'diterima') {
+            const newStatus =
+                kamar.status === 'terbuka' ? 'terkunci' : 'terbuka';
+            await kamar.update({ status: newStatus });
+        }
+
+        res.status(200).json({
+            message: `Update berhasil. Request keluar-masuk ${status}`,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Terjadi kesalahan saat proses request',
+            errMsg: error.message,
+        });
+    }
+};
 
 const handleRequestKeluarMasuk = async (req, res) => {
     const { user_id, user_role } = req.loginData;
@@ -318,6 +327,6 @@ module.exports = {
     getAllLogKeluarMasuk,
     getAllLogKeluarMasukOfDormitizen,
     cekStatus,
-    // ubahStatus,
+    ubahStatus,
     handleRequestKeluarMasuk,
 };
