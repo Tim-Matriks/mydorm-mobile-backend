@@ -68,6 +68,7 @@ const getAllNotificationByUser = async (req, res) => {
     try {
         const notifikasi = await Notifikasi.findAll({
             where: { user_id },
+            order: [['created_at', 'DESC']],
         });
         return res.json({
             message: 'Data notifikasi berhasil diambil',
