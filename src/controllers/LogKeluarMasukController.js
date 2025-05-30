@@ -319,6 +319,23 @@ const handleRequestKeluarMasuk = async (req, res) => {
         });
         const kamarStatus = kamar.status;
 
+        const helpdesk = await Helpdesk.findAll({
+            where: { gedung_id: kamar.gedung_id },
+            include: { model: User, attributes: ['fcm_token'] },
+        });
+        for (const hd of helpdesk) {
+            if (hd.user.fcm_token) {
+                const notifTitle = 'Log Keluar Masuk';
+                const notifBody = 'Terdapat Request Keluar-Masuk';
+
+                await sendNotification({
+                    fcm_token: hd.user.fcm_token,
+                    title: notifTitle,
+                    body: notifBody,
+                });
+            }
+        }
+
         // Cek status sebelumnya untuk log berikutnya
         if (kamarStatus === 'terkunci') {
             const request = await LogKeluarMasuk.create({
