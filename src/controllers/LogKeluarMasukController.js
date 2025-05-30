@@ -262,7 +262,7 @@ const ubahStatus = async (req, res) => {
                     isi: notifBody,
                     user_id: penghuni.user_id,
                 });
-                if (penghuni.fcm_token) {
+                if (penghuni.user.fcm_token) {
                     await sendNotification({
                         fcm_token: penghuni.user.fcm_token,
                         title: notifTitle,
