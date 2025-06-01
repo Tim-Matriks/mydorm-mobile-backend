@@ -191,11 +191,11 @@ const cekStatus = async (req, res) => {
         } else {
             if (kamarnya.status == 'terkunci') {
                 status = 'Kamar terkunci';
-            } else if (kamarnya.aktivitas == 'terbuka') {
+            } else if (kamarnya.status == 'terbuka') {
                 status = 'Kamar terbuka';
             }
         }
-        res.json({
+        return res.json({
             message: 'Status kamar dormitizen berhasil diambil',
             status,
         });
