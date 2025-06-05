@@ -62,7 +62,7 @@ const getAllKamarStatus = async (req, res) => {
         response.forEach((kamar) => {
             if (kamar.status === 'terbuka') {
                 countTerbuka++;
-            } else if (kamar.status === 'tertutup') {
+            } else if (kamar.status === 'terkunci') {
                 countTertutup++;
             }
         });
