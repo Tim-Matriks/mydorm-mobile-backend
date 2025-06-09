@@ -22,6 +22,11 @@ const getAllLogKeluarMasuk = async (req, res) => {
     try {
         const gedung_id = await getUserGedungId(user_id, user_role);
 
+        let whereOnlyNotSR;
+        if (user_role == 'senior_resident') {
+            whereOnlyNotSR = { is_senior: false };
+        }
+
         const response = await LogKeluarMasuk.findAll({
             where: { '$dormitizen.kamar.gedung_id$': gedung_id },
             include: [
@@ -32,6 +37,7 @@ const getAllLogKeluarMasuk = async (req, res) => {
                         model: Kamar,
                         as: 'kamar',
                     },
+                    where: whereOnlyNotSR,
                 },
                 {
                     model: User,
