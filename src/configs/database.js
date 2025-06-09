@@ -26,6 +26,11 @@ const db = new Sequelize(process.env.MYSQL_URL, {
         createdAt: 'created_at',
         updatedAt: 'updated_at',
     },
+    dialectOptions: {
+        dateStrings: true,
+        typeCast: true,
+        timezone: '+07:00',
+    },
 });
 
 module.exports = db;
