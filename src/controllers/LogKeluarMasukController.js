@@ -374,10 +374,85 @@ const handleRequestKeluarMasuk = async (req, res) => {
     }
 };
 
+const tambahLogManual = async (req, res) => {
+    const { user_id, user_role } = req.loginData;
+    const { dormitizen_id, waktu } = req.body;
+    const status = 'diterima';
+
+    if (user_role == 'dormitizen')
+        return res
+            .status(403)
+            .json({ message: 'Anda tidak boleh mengakses halaman ini' });
+
+    try {
+        const dormitizen = await Dormitizen.findByPk(dormitizen_id);
+        if (!dormitizen) {
+            return res
+                .status(404)
+                .json({ message: 'Dormitizen dengan id tersebut tidak ada' });
+        }
+        const kamarDormitizen = await Kamar.findByPk(dormitizen.kamar_id);
+        const statusKamar = kamarDormitizen.status;
+
+        const aktivitas = statusKamar === 'terbuka' ? 'keluar' : 'masuk';
+
+        const penghuniKamar = await Dormitizen.findAll({
+            where: { kamar_id: dormitizen.kamar_id },
+        });
+
+        const dormitizen_ids = penghuniKamar.map((p) => p.dormitizen_id);
+        const response = await LogKeluarMasuk.findAll({
+            where: {
+                dormitizen_id: {
+                    [Op.in]: dormitizen_ids,
+                },
+            },
+            order: [['created_at', 'DESC']],
+        });
+        logTerakhir = response[0];
+
+        const waktuLogTerakhir = logTerakhir?.waktu;
+        const waktuDariBody = new Date(waktu);
+
+        if (!waktuLogTerakhir || waktuDariBody > new Date(waktuLogTerakhir)) {
+            const logBaru = await LogKeluarMasuk.create({
+                waktu,
+                aktivitas,
+                status,
+                dormitizen_id,
+                pencatat_id: user_id,
+            });
+
+            const newStatus =
+                statusKamar === 'terbuka' ? 'terkunci' : 'terbuka';
+            await kamarDormitizen.update({ status: newStatus });
+
+            return res.status(201).json({
+                message: `Log ${aktivitas} manual berhasil ditambahkan`,
+                data: logBaru,
+            });
+        } else {
+            return res.status(400).json({
+                message:
+                    'Waktu request harus lebih baru dari waktu log paling terbaru',
+                waktuLogTerakhir,
+                waktuDariBody,
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: 'Terjadi kesalahan saat proses request',
+            errMsg: error.message,
+        });
+    }
+};
+
 module.exports = {
     getAllLogKeluarMasuk,
     getAllLogKeluarMasukOfDormitizen,
     cekStatus,
     ubahStatus,
     handleRequestKeluarMasuk,
+    tambahLogManual,
 };
