@@ -1,6 +1,6 @@
 const { Pelanggaran, Dormitizen } = require('../models');
 const deleteFile = require('../utils/fileHelpers');
-const userRoleDetails = require('../utils/userRoleDetail');
+const { userRoleDetails } = require('../utils/userRoleDetail');
 
 const getAllPelanggaran = async (req, res) => {
     try {

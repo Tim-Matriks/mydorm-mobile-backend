@@ -6,7 +6,10 @@ const {
     User,
     Notifikasi,
 } = require('../models');
-const userRoleDetails = require('../utils/userRoleDetail.js');
+const {
+    userRoleDetails,
+    getUserGedungId,
+} = require('../utils/userRoleDetail.js');
 const { Op } = require('sequelize');
 const { sendNotification } = require('./NotifikasiController');
 
@@ -17,22 +20,7 @@ const getAllLogKeluarMasuk = async (req, res) => {
             .status(403)
             .json({ message: 'Anda tidak boleh mengakses halaman ini' });
     try {
-        let userDetail, gedung_id;
-        if (user_role == 'helpdesk') {
-            userDetail = await Helpdesk.findOne({
-                where: { user_id },
-            });
-            gedung_id = userDetail.gedung_id;
-        } else {
-            userDetail = await Dormitizen.findOne({
-                where: { user_id },
-                include: {
-                    model: Kamar,
-                    as: 'kamar',
-                },
-            });
-            gedung_id = userDetail.kamar.gedung_id;
-        }
+        const gedung_id = await getUserGedungId(user_id, user_role);
 
         const response = await LogKeluarMasuk.findAll({
             where: { '$dormitizen.kamar.gedung_id$': gedung_id },

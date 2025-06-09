@@ -7,7 +7,7 @@ const {
     Notifikasi,
 } = require('../models');
 const deleteFile = require('../utils/fileHelpers');
-const userRoleDetails = require('../utils/userRoleDetail');
+const { userRoleDetails } = require('../utils/userRoleDetail');
 const dayjs = require('dayjs');
 const { sendNotification } = require('./NotifikasiController');
 const { Op } = require('sequelize');
