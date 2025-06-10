@@ -5,30 +5,31 @@ const { DataTypes } = Sequelize;
 
 const Paket = db.define('paket', {
     paket_id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
-        autoIncrement: true,
     },
-    status_pengambilan: DataTypes.ENUM('sudah', 'belum'),
-    waktu_tiba: DataTypes.DATE,
-    waktu_diambil: DataTypes.DATE,
-    waktu_diambil: DataTypes.DATE,
-    dormitizen_id: {
-        type: DataTypes.BIGINT,
+    status_pengambilan: { type: DataTypes.ENUM, values: ['sudah', 'belum'] },
+    waktu_tiba: { type: DataTypes.DATE, allowNull: false },
+    waktu_diambil: { type: DataTypes.DATE },
+    pemilik_paket_id: {
+        type: DataTypes.UUID,
         references: {
             model: 'dormitizen',
             key: 'dormitizen_id',
         },
+        allowNull: false,
     },
-    penerima_paket: {
-        type: DataTypes.BIGINT,
+    penerima_paket_id: {
+        type: DataTypes.UUID,
         references: {
             model: 'helpdesk',
             key: 'helpdesk_id',
         },
+        allowNull: false,
     },
-    penyerahan_paket: {
-        type: DataTypes.BIGINT,
+    penyerah_paket_id: {
+        type: DataTypes.UUID,
         references: {
             model: 'helpdesk',
             key: 'helpdesk_id',

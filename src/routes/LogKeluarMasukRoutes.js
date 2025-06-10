@@ -1,10 +1,18 @@
 const express = require('express');
 const router = express.Router();
 
-const LogKeluarMasukController = require('../controllers/LogKeluarMasukController');
+const {
+    getAllLogKeluarMasuk,
+    getAllLogKeluarMasukOfDormitizen,
+    cekStatus,
+    ubahStatus,
+    handleRequestKeluarMasuk,
+} = require('../controllers/LogKeluarMasukController');
 
-router.get('/', LogKeluarMasukController.getAllLogKeluarMasukByUser);
-router.get('/status', LogKeluarMasukController.cekStatus);
-router.post('/keluar', LogKeluarMasukController.requestKeluar);
+router.get('/', getAllLogKeluarMasuk);
+router.get('/me', getAllLogKeluarMasukOfDormitizen);
+router.get('/status', cekStatus);
+router.put('/status/:aksi/:id', ubahStatus);
+router.post('/request', handleRequestKeluarMasuk);
 
 module.exports = router;

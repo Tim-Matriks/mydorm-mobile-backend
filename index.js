@@ -5,32 +5,50 @@ const cors = require('cors');
 const db = require('./src/configs/database.js');
 const cookieParser = require('cookie-parser');
 const verifyJWT = require('./src/middleware/verifyJWT.js');
+const errorHandler = require('./src/middleware/error/errorHandler.js');
+const notFoundHandler = require('./src/middleware/error/notFoundHandler.js');
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
+app.use(express.static('public'));
 
 // Untuk mengatur relasi antar tabel
-require('./src/models/Association.js');
+require('./src/models/index.js');
 
 (async () => {
     await db.sync();
+    console.log('All models were synchronized successfully.');
 })();
 app.use('/', require('./src/routes/AuthRoutes.js'));
-app.use('/user', verifyJWT, require('./src/routes/DormitizenRoutes.js'));
+app.use('/', require('./src/routes/importRoutes.js'));
+app.use('/helpdesk', require('./src/routes/HelpdeskAuthRoutes.js'));
+app.use('/user', verifyJWT, require('./src/routes/UserRoutes.js'));
+app.use('/dormitizen', verifyJWT, require('./src/routes/DormitizenRoutes.js'));
 app.use('/laporan', verifyJWT, require('./src/routes/LaporanRoutes.js'));
-app.use('/berita', verifyJWT, require('./src/routes/BeritaRoutes.js'));
+app.use('/informasi', verifyJWT, require('./src/routes/InformasiRoutes.js'));
+app.use('/paket', verifyJWT, require('./src/routes/PaketRoutes.js'));
+app.use('/kamar', verifyJWT, require('./src/routes/KamarRoutes.js'));
+app.use(
+    '/notification',
+    verifyJWT,
+    require('./src/routes/NotifikasiRoutes.js')
+);
+
 app.use(
     '/pelanggaran',
     verifyJWT,
     require('./src/routes/PelanggaranRoutes.js')
 );
 app.use(
-    '/logKeluarMasuk',
+    '/log-keluar-masuk',
     verifyJWT,
     require('./src/routes/LogKeluarMasukRoutes.js')
 );
+
+app.use(errorHandler);
+app.use(notFoundHandler);
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);

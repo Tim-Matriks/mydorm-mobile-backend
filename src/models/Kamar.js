@@ -5,14 +5,17 @@ const { DataTypes } = Sequelize;
 
 const Kamar = db.define('kamar', {
     kamar_id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
-        autoIncrement: true,
     },
-    nomor: DataTypes.STRING(3),
-    status: DataTypes.ENUM('terbuka', 'terkunci'),
+    nomor: { type: DataTypes.STRING(3), allowNull: false },
+    status: {
+        type: DataTypes.ENUM('terbuka', 'terkunci'),
+        defaultValue: 'terbuka',
+    },
     gedung_id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.UUID,
         references: {
             model: 'gedung',
             key: 'gedung_id',

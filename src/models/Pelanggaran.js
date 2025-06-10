@@ -5,22 +5,22 @@ const { DataTypes } = Sequelize;
 
 const Pelanggaran = db.define('pelanggaran', {
     pelanggaran_id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
-        autoIncrement: true,
     },
-    kategori: DataTypes.STRING(100),
-    waktu: DataTypes.DATE,
-    gambar: DataTypes.STRING,
-    senior_resident_id: {
-        type: DataTypes.BIGINT,
+    kategori: { type: DataTypes.STRING(100), allowNull: false },
+    waktu: { type: DataTypes.DATE, allowNull: false },
+    gambar: { type: DataTypes.STRING, allowNull: false },
+    pelapor_id: {
+        type: DataTypes.UUID,
         references: {
-            model: 'senior_resident',
-            key: 'senior_resident_id',
+            model: 'dormitizen',
+            key: 'dormitizen_id',
         },
     },
-    dormitizen_id: {
-        type: DataTypes.BIGINT,
+    pelanggar_id: {
+        type: DataTypes.UUID,
         references: {
             model: 'dormitizen',
             key: 'dormitizen_id',

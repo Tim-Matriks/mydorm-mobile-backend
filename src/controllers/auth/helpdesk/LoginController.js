@@ -1,5 +1,4 @@
-// const Dormitizen = require('../../../models/dormitizen.js');
-const SeniorResident = require('../../../models/SeniorResident.js');
+const Helpdesk = require('../../../models/Helpdesk.js');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -13,17 +12,17 @@ const handleLogin = async (req, res) => {
     }
 
     try {
-        const dormitizenFound = await Dormitizen.findOne({
+        const helpdeskFound = await Helpdesk.findOne({
             where: { username },
         });
-        if (!dormitizenFound) {
+        if (!helpdeskFound) {
             return res
                 .status(401)
                 .json({ message: 'Username atau password salah' });
         }
         const verifikasi = await bcrypt.compare(
             password,
-            dormitizenFound.password
+            helpdeskFound.password
         );
         if (!verifikasi) {
             return res
@@ -31,39 +30,29 @@ const handleLogin = async (req, res) => {
                 .json({ message: 'Username atau password salah' });
         }
 
-        // Cari apakah yang login itu SR atau bukan
-        $seniorResidentFound = await SeniorResident.findOne({
-            where: { dormitizen_id: dormitizenFound.dormitizen_id },
-        });
-        const user_type = $seniorResidentFound
-            ? 'senior_resident'
-            : 'dormitizen';
-
         const accessToken = jwt.sign(
-            { user_id: dormitizenFound.dormitizen_id, type: user_type },
+            { user_id: helpdeskFound.helpdesk_id, type: 'helpdesk' },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '60m' }
         );
         const refreshToken = jwt.sign(
-            { user_id: dormitizenFound.dormitizen_id, type: user_type },
+            { user_id: helpdeskFound.helpdesk_id, type: 'helpdesk' },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '1d' }
         );
 
-        await Dormitizen.update(
+        await Helpdesk.update(
             { refresh_token: refreshToken },
-            { where: { dormitizen_id: dormitizenFound.dormitizen_id } }
+            { where: { helpdesk_id: helpdeskFound.helpdesk_id } }
         );
 
         res.cookie('jwt', refreshToken, {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000,
-            sameSite: 'None',
-            secure: false,
         });
         res.json({
             message: 'Login berhasil',
-            user_type,
+            user_type: 'Helpdesk',
             accessToken,
         });
     } catch (error) {

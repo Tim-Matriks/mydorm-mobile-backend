@@ -5,32 +5,37 @@ const { DataTypes } = Sequelize;
 
 const LogKeluarMasuk = db.define('log_keluar_masuk', {
     log_keluar_masuk_id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
-        autoIncrement: true,
     },
-    waktu: DataTypes.DATE,
-    aktivitas: DataTypes.ENUM('keluar', 'masuk'),
-    status: DataTypes.ENUM('diterima', 'ditolak', 'pending'),
+    waktu: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+    },
+    aktivitas: {
+        type: DataTypes.ENUM,
+        values: ['keluar', 'masuk'],
+        allowNull: false,
+    },
+    status: {
+        type: DataTypes.ENUM,
+        values: ['diterima', 'ditolak', 'pending'],
+        allowNull: false,
+    },
     dormitizen_id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.UUID,
         references: {
             model: 'dormitizen',
             key: 'dormitizen_id',
         },
     },
-    senior_resident_id: {
-        type: DataTypes.BIGINT,
+    pencatat_id: {
+        type: DataTypes.UUID,
         references: {
-            model: 'senior_resident',
-            key: 'senior_resident_id',
-        },
-    },
-    helpdesk_id: {
-        type: DataTypes.BIGINT,
-        references: {
-            model: 'helpdesk',
-            key: 'helpdesk_id',
+            model: 'user',
+            key: 'user_id',
         },
     },
 });

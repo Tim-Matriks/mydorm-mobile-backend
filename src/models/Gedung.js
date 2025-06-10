@@ -5,12 +5,12 @@ const { DataTypes } = Sequelize;
 
 const Gedung = db.define('gedung', {
     gedung_id: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
-        autoIncrement: true,
     },
-    kode: DataTypes.STRING(10),
-    nama: DataTypes.STRING(10),
+    kode: { type: DataTypes.STRING(10), allowNull: false },
+    nama: { type: DataTypes.STRING(10), allowNull: false },
 });
 
 module.exports = Gedung;
