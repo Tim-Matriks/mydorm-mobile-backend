@@ -1,20 +1,37 @@
-const { User, Dormitizen, Helpdesk } = require('../models');
+const { User, Dormitizen, Helpdesk, Kamar } = require('../models');
 const Informasi = require('../models/Informasi');
 const deleteFile = require('../utils/fileHelpers');
 const { Op } = require('sequelize');
+const { getUserGedungId } = require('../utils/userRoleDetail');
 
 const getAllInformasi = async (req, res) => {
+    const { user_id, user_role } = req.loginData;
     const { search, kategori } = req.query;
     try {
-        const where = {};
+        let where = {};
+
+        const gedung_id = await getUserGedungId(user_id, user_role);
+
+        const baseConditions = [];
 
         if (search) {
-            where.judul = { [Op.like]: `%${search}%` };
+            baseConditions.push({ judul: { [Op.like]: `%${search}%` } });
         }
 
         if (kategori) {
-            where.kategori = kategori;
+            baseConditions.push({ kategori });
         }
+
+        baseConditions.push({
+            [Op.or]: [
+                { '$penulis.dormitizen.kamar.gedung_id$': gedung_id },
+                { '$penulis.helpdesk.gedung_id$': gedung_id },
+            ],
+        });
+
+        where = {
+            [Op.and]: baseConditions,
+        };
 
         const allInfo = await Informasi.findAll({
             order: [['created_at', 'DESC']],
@@ -23,8 +40,19 @@ const getAllInformasi = async (req, res) => {
                 as: 'penulis',
                 attributes: ['user_id'],
                 include: [
-                    { model: Dormitizen, attributes: ['nama', 'gambar'] },
-                    { model: Helpdesk, attributes: ['nama', 'gambar'] },
+                    {
+                        model: Dormitizen,
+                        attributes: ['nama', 'gambar'],
+                        include: {
+                            model: Kamar,
+                            as: 'kamar',
+                            attributes: ['gedung_id'],
+                        },
+                    },
+                    {
+                        model: Helpdesk,
+                        attributes: ['nama', 'gambar', 'gedung_id'],
+                    },
                 ],
             },
             where,

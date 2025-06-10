@@ -7,15 +7,18 @@ const {
     Notifikasi,
 } = require('../models');
 const deleteFile = require('../utils/fileHelpers');
-const { userRoleDetails } = require('../utils/userRoleDetail');
+const { userRoleDetails, getUserGedungId } = require('../utils/userRoleDetail');
 const dayjs = require('dayjs');
 const { sendNotification } = require('./NotifikasiController');
 const { Op } = require('sequelize');
 
 const getAllPaket = async (req, res) => {
+    const { user_id, user_role } = req.loginData;
     const { search } = req.query;
 
     try {
+        const gedung_id = await getUserGedungId(user_id, user_role);
+
         const where = {};
         if (search) {
             where.nama = { [Op.like]: `%${search}%` };
@@ -38,6 +41,7 @@ const getAllPaket = async (req, res) => {
                 { model: Helpdesk, as: 'penyerah_paket' },
             ],
             order: [['created_at', 'DESC']],
+            where: { '$pemilik_paket.kamar.gedung_id$': gedung_id },
         });
 
         return res.json({

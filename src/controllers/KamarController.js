@@ -1,4 +1,5 @@
 const { Dormitizen, Helpdesk, Kamar, Gedung } = require('../models');
+const { getUserGedungId } = require('../utils/userRoleDetail');
 
 const getUserKamarStatus = async (req, res) => {
     const { user_id, user_role } = req.loginData;
@@ -25,25 +26,7 @@ const getAllKamarStatus = async (req, res) => {
     const { user_id, user_role } = req.loginData;
 
     try {
-        let me;
-        let gedung_id;
-        if (user_role == 'helpdesk') {
-            me = await Helpdesk.findOne({
-                where: { user_id },
-            });
-            gedung_id = me.gedung_id;
-        } else {
-            me = await Dormitizen.findOne({
-                where: { user_id },
-                attributes: ['nama'],
-                include: {
-                    model: Kamar,
-                    as: 'kamar',
-                    attributes: { include: ['gedung_id'] },
-                },
-            });
-            gedung_id = me.kamar.gedung_id;
-        }
+        const gedung_id = await getUserGedungId(user_id, user_role);
 
         const response = await Kamar.findAll({
             attributes: ['nomor', 'status'],
