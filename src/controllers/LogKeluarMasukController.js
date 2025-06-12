@@ -15,6 +15,8 @@ const { sendNotification } = require('./NotifikasiController');
 
 const getAllLogKeluarMasuk = async (req, res) => {
     const { user_id, user_role } = req.loginData;
+    const { search } = req.query;
+
     if (user_role == 'dormitizen')
         return res
             .status(403)
@@ -22,10 +24,19 @@ const getAllLogKeluarMasuk = async (req, res) => {
     try {
         const gedung_id = await getUserGedungId(user_id, user_role);
 
-        let whereOnlyNotSR;
-        if (user_role == 'senior_resident') {
-            whereOnlyNotSR = { is_senior: false };
+        const baseConditions = [];
+
+        if (search) {
+            baseConditions.push({ nama: { [Op.like]: `%${search}%` } });
         }
+
+        if (user_role == 'senior_resident') {
+            baseConditions.push({ is_senior: false });
+        }
+
+        where = {
+            [Op.and]: baseConditions,
+        };
 
         const response = await LogKeluarMasuk.findAll({
             where: { '$dormitizen.kamar.gedung_id$': gedung_id },
@@ -37,7 +48,7 @@ const getAllLogKeluarMasuk = async (req, res) => {
                         model: Kamar,
                         as: 'kamar',
                     },
-                    where: whereOnlyNotSR,
+                    where,
                 },
                 {
                     model: User,
