@@ -113,4 +113,4 @@ const exportLogKeluarMasuk = async (req, res) => {
     }
 };
 
-module.exports = { exportLogKeluarMasuk, exportPaket };
+module.exports = { exportLogKeluarMasuk };
