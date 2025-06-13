@@ -46,6 +46,7 @@ app.use(
     verifyJWT,
     require('./src/routes/LogKeluarMasukRoutes.js')
 );
+app.use('/report', verifyJWT, require('./src/routes/ReportRoutes.js'));
 
 app.use(errorHandler);
 app.use(notFoundHandler);
